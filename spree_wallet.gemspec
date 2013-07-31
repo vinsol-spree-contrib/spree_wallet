@@ -6,7 +6,7 @@ Gem::Specification.new do |s|
   s.summary     = 'Add payment method wallet to spree'
   s.required_ruby_version = '>= 1.9.3'
 
-  s.author    = 'Nishant Tuteja'
+  s.author    = "Nishant 'CyRo' Tuteja"
   s.email     = 'nishant.tuteja@vinsol.com'
 
   s.require_path = 'lib'
