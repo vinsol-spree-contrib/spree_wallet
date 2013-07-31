@@ -3,7 +3,7 @@
   <div data-hook="checkout_payment_step">
 
 
-    <% if spree_current_user %>
+    <% if spree_current_user && @order.available_wallet_payment_method %>
       <%= check_box_tag "order[payments_attributes][][payment_method_id]", @order.available_wallet_payment_method.id %>
       <%= Spree.t(@order.available_wallet_payment_method.name, :scope => :payment_methods, :default => @order.available_wallet_payment_method.name) %>( <%= spree_current_user.store_credits_total %> )
     <% end %>

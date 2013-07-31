@@ -31,6 +31,7 @@ describe Spree::CheckoutController do
       controller.stub(:after_update_attributes).and_return(false)
       order.stub(:update_attributes).and_return(true)
       order.stub(:next).and_return(true)
+      order.stub(:available_wallet_payment_method?).and_return(wallet_payment_method)
       order.stub(:completed?).and_return(true)
     end
     
@@ -60,6 +61,14 @@ describe Spree::CheckoutController do
         it_should_behave_like 'not_required_to_validate_payments'
       end
 
+      context 'when order doesn\'t have any available_wallet_payment_method' do
+        before(:each) do
+          order.stub(:available_wallet_payment_method?).and_return(nil)
+        end
+
+        it_should_behave_like 'not_required_to_validate_payments'
+      end
+
       context 'when order state is not payment' do
         before(:each) do
           order.stub(:payment?).and_return(false)
@@ -74,12 +83,7 @@ describe Spree::CheckoutController do
           send_request(:order => { :payments_attributes => [{:payment_method_id => check_payment_method.id}]})
         end
 
-        context 'when there is no spree_current_user' do
-          before(:each) do
-            controller.stub(:spree_current_user).and_return(nil)
-            controller.stub(:check_registration).and_return(true)
-          end
-
+        shared_examples_for 'no_wallet_payment' do
           context 'when there is wallet_payment' do
             it 'should have flash error with message Spree.t(:cannot_select_wallet_while_guest_checkout)' do
               send_request(:order => { :payments_attributes => [{:payment_method_id => wallet_payment_method.id}]})
@@ -103,6 +107,25 @@ describe Spree::CheckoutController do
               response.should_not redirect_to checkout_state_path(order.state)
             end
           end
+        end
+
+        context 'when there is no spree_current_user' do
+          before(:each) do
+            controller.stub(:spree_current_user).and_return(nil)
+            controller.stub(:check_registration).and_return(true)
+          end
+
+          it_should_behave_like 'no_wallet_payment'
+        end
+
+        context 'when there is no available_wallet_payment_method' do
+          before(:each) do
+            controller.stub(:spree_current_user).and_return(user)
+            order.stub(:available_wallet_payment_method).and_return(nil)
+            controller.stub(:check_registration).and_return(true)
+          end
+
+          it_should_behave_like 'no_wallet_payment'
         end
 
         context 'when there is spree_current_user' do
