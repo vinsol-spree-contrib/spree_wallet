@@ -1,0 +1,86 @@
+<%= render :partial => 'spree/admin/shared/configuration_menu' %>
+
+<% content_for :table_filter do %>
+  <div data-hook="admin_store_credits_sidebar">
+
+    <%= search_form_for [:admin, @user, @search] do |f| %>
+      <div data-hook="admin_store_credits_index_search">
+        <div class="alpha nine columns">
+          <div class="field">
+            <%= f.label :transaction_id_eq, Spree.t(:transaction_id) %>
+            <%= f.text_field :transaction_id_eq %>
+          </div>
+
+          <% unless @user %>
+            <div class="field">
+              <%= f.label :user_email_cont, Spree.t(:user_email) %>
+              <%= f.text_field :user_email_cont %>
+            </div>
+          <% end %>
+        </div>
+      </div>
+
+      <div class="clear"></div>
+
+      <div class="form-buttons actions filter-actions" data-hook="admin_products_index_search_buttons">
+        <%= button Spree.t(:search), 'icon-search' %>
+      </div>
+    <% end %>
+  </div>
+<% end %>
+
+<% content_for :page_title do %>
+  <% if @user %>
+    <%= Spree.t(:store_credits_for_user_email, user_email: @user.email) %>
+  <% else %>
+    <%= Spree.t(:listing_store_credits) %>
+  <% end %>
+<% end %>
+
+<% if @user %>
+  <% content_for :page_actions do %>
+    <li>
+      <%= button_link_to Spree.t(:new_credit), new_admin_user_credit_path(:user_id => @user) %>
+      <%= button_link_to Spree.t(:new_debit), new_admin_user_debit_path(:user_id => @user) %>
+    </li>
+  <% end %>
+<% end %>
+
+<%= paginate @store_credits %>
+
+<table class="index">
+  <thead>
+    <tr>
+      <th><%= sort_link @search, :transaction_id, Spree.t(:transaction_number) %></th>
+      <% unless @user %>
+        <th><%= sort_link @search, :user_email, Spree.t(:user) %></th>
+      <% end %>
+      <th><%= sort_link @search, :amount, Spree.t(:amount) %></th>
+      <th><%= sort_link @search, :balance, Spree.t(:balance) %></th>
+      <th><%= Spree.t(:reason) %></th>
+      <th><%= Spree.t(:payment_mode) %></th>
+      <th><%= sort_link @search, :type, Spree.t(:type) %></th>
+      <% unless @user %>
+        <th><%= Spree.t(:action) %></th>
+      <% end %>
+    </tr>
+  </thead>
+  <tbody>
+    <% @store_credits.each do |store_credit|%>
+      <tr id="<%= cycle('odd', 'even') %>">
+        <td class="align-center"><%= store_credit.transaction_id %></td>
+        <% unless @user %>
+          <td class="align-center"><%= link_to store_credit.user.email, admin_user_path(store_credit.user) %></td>
+        <% end %>
+        <td class="align-center"><%= number_to_currency store_credit.amount %></td>
+        <td class="align-center"><%= number_to_currency store_credit.balance %></td>
+        <td class="align-center"><%= store_credit.reason %></td>
+        <td class="align-center"><%= store_credit.class::PAYMENT_MODE.key(store_credit.payment_mode) %>
+        <td class="align-center"><%= store_credit.type.demodulize %></td>
+        <% unless @user %>
+          <td><%= link_to Spree.t(:credit), new_admin_user_credit_path(:user_id => store_credit.user) %> | <%= link_to Spree.t(:debit), new_admin_user_debit_path(:user_id => store_credit.user) %> | <%= link_to Spree.t(:view), admin_user_store_credits_path(:user_id => store_credit.user) %></td>
+        <% end %>
+      </tr>
+      <% end %>
+  </tbody>
+</table>

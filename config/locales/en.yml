@@ -1,0 +1,19 @@
+# Sample localization file for English. Add more files in this directory for other locales.
+# See https://github.com/svenfuchs/rails-i18n/tree/master/rails%2Flocale for starting points.
+
+en:
+  spree:
+    store_credits_action: "Store Credits Action"
+    listing_store_credits: "Listing Store Credits"
+    store_credits: "Store Credits"
+    new_credit: "New Credit"
+    new_debit: "New Debit"
+    credit: "Credit"
+    debit: "Debit"
+    view: "View"
+    store_credits_for_user_email: "Store Credits For %{user_email}"
+    not_sufficient_amount_in_wallet: "Payment could not be processed. Because you don't have sufficient amount in your wallet. Please choose another payment method with it."
+    new_store_credit: "New Store Credit"
+    new_store_debit: "New Store Debit"
+    cannot_select_wallet_while_guest_checkout: "Payment Method Wallet Cann't be selected while guest checkout."
+    wallet_not_linked_to_user: "There is no wallet linked to the user of this order"

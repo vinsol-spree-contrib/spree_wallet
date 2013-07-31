@@ -1,0 +1,49 @@
+<fieldset id="payment" data-hook>
+  <legend align="center"><%= Spree.t(:payment_information) %></legend>
+  <div data-hook="checkout_payment_step">
+
+
+    <% if spree_current_user %>
+      <%= check_box_tag "order[payments_attributes][][payment_method_id]", @order.available_wallet_payment_method.id %>
+      <%= Spree.t(@order.available_wallet_payment_method.name, :scope => :payment_methods, :default => @order.available_wallet_payment_method.name) %>( <%= spree_current_user.store_credits_total %> )
+    <% end %>
+    
+    <% @order.available_payment_methods_without_wallet.each do |method| %>
+    <p>
+      <label>
+        <%= radio_button_tag "order[payments_attributes][][payment_method_id]", method.id %>
+        <%= Spree.t(method.name, :scope => :payment_methods, :default => method.name) %>
+      </label>
+    </p>
+    <% end %>
+
+    <ul id="payment-methods" data-hook>
+      <% @order.available_payment_methods_without_wallet.each do |method| %>
+      <!-- hidden class is added to hide the partial initially -->
+        <li id="payment_method_<%= method.id %>" class="hidden <%= 'last' if method == @order.available_payment_methods_without_wallet.last %>" data-hook>
+          <fieldset>
+            <%= render :partial => "spree/checkout/payment/#{method.method_type}", :locals => { :payment_method => method } %>
+          </fieldset>
+        </li>
+      <% end %>
+    </ul>
+    <br style="clear:both;" />
+    <% if Spree::Promotion.with_code.count > 0 %>
+      <p class='field' data-hook='coupon_code'>
+        <%= form.label :coupon_code %><br />
+        <%= form.text_field :coupon_code %>
+      </p>
+    <% end %>
+  </div>
+</fieldset>
+
+<br class="space" />
+
+<div class="form-buttons" data-hook="buttons">
+  <%= submit_tag Spree.t(:save_and_continue), :class => 'continue button primary' %>
+  <script>Spree.disableSaveOnClick();</script>
+</div>
+
+<%= content_for :head do %>
+  <%= stylesheet_link_tag 'store/checkout' %>
+<% end %>
