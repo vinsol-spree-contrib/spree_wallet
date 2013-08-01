@@ -53,12 +53,13 @@ RSpec.configure do |config|
   config.color = true
 
   # Remove this line if you're not using ActiveRecord or ActiveRecord fixtures
-  config.fixture_path = "#{::Rails.root}/spec/fixtures"
+  config.fixture_path = ["spec/fixtures"] 
 
   # Capybara javascript drivers require transactional fixtures set to false, and we use DatabaseCleaner
   # to cleanup after each test instead.  Without transactional fixtures set to false the records created
   # to setup a test will be unavailable to the browser, which runs under a seperate server instance.
   config.use_transactional_fixtures = false
+  config.include Spree::Core::Engine.routes.url_helpers
 
   # Ensure Suite is set to use transactions for speed.
   config.before :suite do

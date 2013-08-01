@@ -1,5 +1,5 @@
 require 'spec_helper'
-require 'shared_examples/disable_negative_payment_mode_ability_spec'
+require 'models/spree/shared_examples/disable_negative_payment_mode_ability_spec'
 
 describe Spree::Debit do
   let(:user) { Spree::User.create!(:email => 'abc@test.com', :password => '123456') }

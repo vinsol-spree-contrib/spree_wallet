@@ -1,3 +1,5 @@
+require 'spec_helper'
+
 describe Spree::CheckoutController do
   let(:order) { mock_model(Spree::Order, :remaining_total => 1000, :state => 'payment') }
   let(:user) { mock_model(Spree::User, :store_credits_total => 500) }
@@ -31,7 +33,7 @@ describe Spree::CheckoutController do
       controller.stub(:after_update_attributes).and_return(false)
       order.stub(:update_attributes).and_return(true)
       order.stub(:next).and_return(true)
-      order.stub(:available_wallet_payment_method?).and_return(wallet_payment_method)
+      order.stub(:available_wallet_payment_method).and_return(wallet_payment_method)
       order.stub(:completed?).and_return(true)
     end
     
@@ -39,7 +41,7 @@ describe Spree::CheckoutController do
       shared_examples_for 'not_required_to_validate_payments' do
         subject { controller }
         before(:each) do
-          send_request
+          send_request(:order => { :payments_attributes => [{:payment_method_id => check_payment_method.id}]})
         end
 
         it { should_not_receive(:validate_payments) }
@@ -63,7 +65,7 @@ describe Spree::CheckoutController do
 
       context 'when order doesn\'t have any available_wallet_payment_method' do
         before(:each) do
-          order.stub(:available_wallet_payment_method?).and_return(nil)
+          order.stub(:available_wallet_payment_method).and_return(nil)
         end
 
         it_should_behave_like 'not_required_to_validate_payments'
@@ -112,16 +114,6 @@ describe Spree::CheckoutController do
         context 'when there is no spree_current_user' do
           before(:each) do
             controller.stub(:spree_current_user).and_return(nil)
-            controller.stub(:check_registration).and_return(true)
-          end
-
-          it_should_behave_like 'no_wallet_payment'
-        end
-
-        context 'when there is no available_wallet_payment_method' do
-          before(:each) do
-            controller.stub(:spree_current_user).and_return(user)
-            order.stub(:available_wallet_payment_method).and_return(nil)
             controller.stub(:check_registration).and_return(true)
           end
 
@@ -252,7 +244,7 @@ describe Spree::CheckoutController do
         end
 
         describe 'payment' do
-          context 'when spree_current_user' do
+          context 'when spree_current_user and order has available_wallet_payment_method' do
             before(:each) do
               controller.stub(:spree_current_user).and_return(user)
             end
@@ -349,13 +341,7 @@ describe Spree::CheckoutController do
             end
           end
 
-          context 'when no spree_current_user' do
-            before(:each) do
-              controller.stub(:check_registration).and_return(true)
-              controller.stub(:spree_current_user).and_return(nil)
-              order.stub(:remaining_total).and_return(1000)
-            end
-
+          shared_examples_for 'not_make_wallet_payment' do
             it 'should receive spree_current_user and return nil' do
               controller.should_receive(:spree_current_user).and_return(nil)
               send_request(:order => { :payments_attributes => [{:payment_method_id => check_payment_method.id}]})
@@ -371,6 +357,26 @@ describe Spree::CheckoutController do
               controller.send(:params)[:order][:payments_attributes].first[:payment_method_id].should eq(check_payment_method.id.to_s)
               controller.send(:params)[:order][:payments_attributes].first[:amount].should eq(order.remaining_total)
             end
+          end
+
+          context 'when no spree_current_user' do
+            before(:each) do
+              controller.stub(:check_registration).and_return(true)
+              controller.stub(:spree_current_user).and_return(nil)
+              order.stub(:remaining_total).and_return(1000)
+            end
+
+            it_should_behave_like 'not_make_wallet_payment'
+          end
+
+          context 'when no available_wallet_payment_method' do
+            before(:each) do
+              controller.stub(:check_registration).and_return(true)
+              order.stub(:remaining_total).and_return(1000)
+              order.stub(:available_wallet_payment_method).and_return(wallet_payment_method)
+            end
+
+            it_should_behave_like 'not_make_wallet_payment'
           end
         end
       end

@@ -15,5 +15,5 @@ en:
     not_sufficient_amount_in_wallet: "Payment could not be processed. Because you don't have sufficient amount in your wallet. Please choose another payment method with it."
     new_store_credit: "New Store Credit"
     new_store_debit: "New Store Debit"
-    cannot_select_wallet_while_guest_checkout: "Payment Method Wallet Cann't be selected while guest checkout."
+    cannot_select_wallet_while_guest_checkout: "Payment Method Wallet can't be selected while guest checkout."
     wallet_not_linked_to_user: "There is no wallet linked to the user of this order"

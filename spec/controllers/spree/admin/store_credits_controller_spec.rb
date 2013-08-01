@@ -6,6 +6,12 @@ describe Spree::Admin::StoreCreditsController do
   let(:store_credits) { [store_credit] }
   let(:ransack_search) { double(Ransack::Search) }
 
+  before(:each) do
+    controller.stub(:spree_current_user).and_return(user)
+    user.stub(:authenticate).and_return(true)
+    user.stub(:generate_spree_api_key!).and_return(true)
+  end
+
   describe '#index' do
     before(:each) do
       controller.stub(:parent).and_return(user)

@@ -1,3 +1,5 @@
+require 'spec_helper'
+
 describe Spree::Admin::PaymentsController do
   let(:user) { mock_model(Spree::User) }
   let(:order) { mock_model(Spree::Order) }
@@ -7,7 +9,6 @@ describe Spree::Admin::PaymentsController do
   let(:credit_card) { mock_model(Spree::CreditCard) }
 
   before(:each) do
-    default_url_options[:host] = 'test.host'
     Spree::Order.stub(:find_by_number!).and_return(order)
   end
 
@@ -232,7 +233,7 @@ describe Spree::Admin::PaymentsController do
       end
 
       it 'should receive completed? and return false' do
-        order.should_receive(:completed?).and_return(false)
+        order.should_receive(:completed?).and_return(false, false, true)
         send_request
       end
 
@@ -261,7 +262,7 @@ describe Spree::Admin::PaymentsController do
 
       it 'should redirect to admin_order_payments_path' do
         send_request
-        response.should redirect_to edit_admin_order_url(order)
+        response.should redirect_to edit_admin_order_url(order, :host => 'test.host')
       end
     end
 
