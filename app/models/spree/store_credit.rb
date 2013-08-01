@@ -3,6 +3,8 @@ module Spree
     attr_accessible :amount, :reason, :payment_mode 
     attr_accessor :disable_negative_payment_mode
 
+    belongs_to :transactioner, :class_name => Spree.user_class
+
     validates :amount, :user_id, :reason, :type, :balance, :transaction_id, :presence => true
     validates :amount, :balance, :numericality => { :greater_than_or_equal_to => 0 }, :allow_blank => true
     validates :transaction_id, :uniqueness => true, :allow_blank => true

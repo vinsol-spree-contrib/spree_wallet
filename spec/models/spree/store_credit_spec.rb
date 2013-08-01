@@ -1,5 +1,9 @@
 require 'spec_helper'
 
+RSpec.configure do |config|
+  config.fixture_path = File.join( File.dirname(__FILE__ + '../'), 'fixtures')
+end
+
 describe Spree::StoreCredit do
   fixtures :spree_users
   set_fixture_class :spree_users => 'Spree::User'
@@ -48,6 +52,7 @@ describe Spree::StoreCredit do
 
   describe 'association' do
     it { should belong_to(:user).class_name(Spree.user_class) }
+    it { should belong_to(:transactioner).class_name(Spree.user_class) }
   end
 
   describe 'callback' do

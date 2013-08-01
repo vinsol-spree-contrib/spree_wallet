@@ -1,5 +1,6 @@
 require 'spec_helper'
-require 'models/spree/shared_examples/disable_negative_payment_mode_ability_spec'
+require File.join( File.dirname(__FILE__), 'shared_examples/disable_negative_payment_mode_ability_spec')
+
 
 describe Spree::Credit do
   let(:user) { Spree::User.create!(:email => 'abc@test.com', :password => '123456') }

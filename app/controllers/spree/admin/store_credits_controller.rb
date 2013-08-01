@@ -3,7 +3,7 @@ module Spree
     class StoreCreditsController < ResourceController
       helper_method :store_credit_class
       skip_before_filter :load_resource, :only => [:index]
-      before_filter :disable_negative_payment_mode, :only => :create
+      before_filter :disable_negative_payment_mode, :add_transactioner_to_store_credit, :only => :create
 
       def index
         @search = association_or_class.ransack(params[:q])
@@ -16,12 +16,16 @@ module Spree
           @store_credit.disable_negative_payment_mode = true
         end
 
+        def add_transactioner_to_store_credit
+          @store_credit.transactioner = spree_current_user
+        end
+
         def self.parent_data
           { :model_class => Spree.user_class, :find_by => :id, :model_name => 'spree/user' }
         end
 
         def association_or_class
-          parent ? parent.store_credits : Spree::StoreCredit.includes(:user)
+          parent ? parent.store_credits.includes(:transactioner) : Spree::StoreCredit.includes(:user, :transactioner)
         end
 
         def build_resource

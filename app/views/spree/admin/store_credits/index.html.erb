@@ -11,6 +11,11 @@
             <%= f.text_field :transaction_id_eq %>
           </div>
 
+          <div class="field">
+            <%= f.label :transactioner_email_cont, Spree.t(:transactioner_email) %>
+            <%= f.text_field :transactioner_email_cont %>
+          </div>
+
           <% unless @user %>
             <div class="field">
               <%= f.label :user_email_cont, Spree.t(:user_email) %>
@@ -55,6 +60,7 @@
       <% unless @user %>
         <th><%= sort_link @search, :user_email, Spree.t(:user) %></th>
       <% end %>
+      <th><%= sort_link @search, :transactioner_email, Spree.t(:transactioner_email) %></th>
       <th><%= sort_link @search, :amount, Spree.t(:amount) %></th>
       <th><%= sort_link @search, :balance, Spree.t(:balance) %></th>
       <th><%= Spree.t(:reason) %></th>
@@ -72,6 +78,7 @@
         <% unless @user %>
           <td class="align-center"><%= link_to store_credit.user.email, admin_user_path(store_credit.user) %></td>
         <% end %>
+        <td class="align-center"><%= store_credit.transactioner.try(:email) %></td>
         <td class="align-center"><%= number_to_currency store_credit.amount %></td>
         <td class="align-center"><%= number_to_currency store_credit.balance %></td>
         <td class="align-center"><%= store_credit.reason %></td>

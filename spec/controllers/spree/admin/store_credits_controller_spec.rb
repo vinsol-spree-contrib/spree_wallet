@@ -8,8 +8,46 @@ describe Spree::Admin::StoreCreditsController do
 
   before(:each) do
     controller.stub(:spree_current_user).and_return(user)
-    user.stub(:authenticate).and_return(true)
+    user.stub(:authenticate)
     user.stub(:generate_spree_api_key!).and_return(true)
+  end
+
+  describe '#create' do
+    let(:store_credit) { Spree::StoreCredit.new }
+
+    def send_request(type = nil)
+      post :create, :user_id => user.id, :type => type, :use_route => 'spree'
+    end
+
+    before(:each) do
+      controller.stub(:load_resource_instance).and_return(store_credit)
+      controller.stub(:authorize_admin).and_return(true)
+      controller.stub(:authorize!).and_return(true)
+    end
+
+    describe 'disable_negative_payment_mode' do
+      it 'should have disable_negative_payment_mode be true' do
+        send_request
+        store_credit.disable_negative_payment_mode.should be_true
+      end
+
+      it 'should receive disable_negative_payment_mode' do
+        controller.should_receive(:disable_negative_payment_mode).and_return(true)
+        send_request
+      end
+    end
+
+    describe 'add_transactioner_to_store_credit' do
+      it 'should have transactioner be user' do
+        send_request
+        store_credit.transactioner.should eq(user)
+      end
+
+      it 'should receive add_transactioner_to_store_credit' do
+        controller.should_receive(:add_transactioner_to_store_credit).and_return(true)
+        send_request
+      end
+    end
   end
 
   describe '#index' do
@@ -20,6 +58,7 @@ describe Spree::Admin::StoreCreditsController do
       controller.stub(:authorize_admin).and_return(true)
       ransack_search.stub(:result).and_return(store_credits)
       store_credits.stub(:page).and_return(store_credits)
+      store_credits.stub(:includes).and_return(store_credits)
     end
 
     def send_request(params = {})
@@ -46,12 +85,17 @@ describe Spree::Admin::StoreCreditsController do
         user.should_receive(:store_credits).and_return(store_credits)
         send_request
       end
+
+      it 'should receive includes on store_credits' do
+        store_credits.should_receive(:includes).with(:transactioner).and_return(store_credits)
+        send_request
+      end
     end
 
     context 'when there is no parent' do
       before(:each) do
         controller.stub(:parent).and_return(nil)
-        Spree::StoreCredit.stub(:includes).with(:user).and_return(store_credits)    
+        Spree::StoreCredit.stub(:includes).with(:user, :transactioner).and_return(store_credits)
       end
 
       it 'should receive parent and return nil' do
@@ -60,7 +104,7 @@ describe Spree::Admin::StoreCreditsController do
       end
 
       it 'should receive includes on Spree::StoreCredit with user' do
-        Spree::StoreCredit.should_receive(:includes).with(:user).and_return(store_credits)
+        Spree::StoreCredit.should_receive(:includes).with(:user, :transactioner).and_return(store_credits)
         send_request
       end
     end

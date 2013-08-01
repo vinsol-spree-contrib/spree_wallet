@@ -53,7 +53,7 @@ RSpec.configure do |config|
   config.color = true
 
   # Remove this line if you're not using ActiveRecord or ActiveRecord fixtures
-  config.fixture_path = ["spec/fixtures"] 
+  config.fixture_path = File.join( File.dirname(__FILE__), 'spec/fixtures')
 
   # Capybara javascript drivers require transactional fixtures set to false, and we use DatabaseCleaner
   # to cleanup after each test instead.  Without transactional fixtures set to false the records created
