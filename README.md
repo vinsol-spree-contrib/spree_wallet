@@ -23,7 +23,9 @@ bundle exec rake db:migrate
 Usage
 -----
 
-From Admin end create a payment method of Wallet type.
+From Admin end, create a payment method of Wallet type. From User end, user can only select or unselect wallet payment type. Spree Wallet will deduce minimum of order total or spree wallet balance of that user. If there's any remaining amount in the order it will be deducted from other payment method.
+
+While from admin end, Admin can select any amount from wallet, but it should be less than amount present in user's balance. 
 
 ## Contribution
 
