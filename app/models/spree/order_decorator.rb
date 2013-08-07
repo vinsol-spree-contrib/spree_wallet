@@ -4,7 +4,7 @@ Spree::Order.class_eval do
   end
 
   def has_unprocessed_payments?
-    payments.with_state('checkout').reload.exists? || (available_wallet_payment_method.present? && (wallet_payment = payments.where(:payment_method_id => available_wallet_payment_method.id).last).present? && wallet_payment.amount == remaining_total)
+    payments.with_state('checkout').reload.exists? || (available_wallet_payment_method.present? && (wallet_payment = payments.where(:payment_method_id => available_wallet_payment_method.id).last).present? && wallet_payment.amount <= remaining_total)
   end
 
   def remaining_total

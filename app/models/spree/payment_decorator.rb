@@ -15,6 +15,12 @@ Spree::Payment.class_eval do
     payment_method.is_a? Spree::PaymentMethod::Wallet
   end
 
+  def invalidate_old_payments
+    order.payments.with_state('checkout').where("id != ?", self.id).each do |payment|
+      payment.invalidate!
+    end unless wallet?
+  end
+
   private
 
     def restrict_wallet_when_no_user
