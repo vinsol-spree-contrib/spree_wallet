@@ -5,7 +5,7 @@ Spree::CheckoutController.class_eval do
     def object_params
       if @order.has_checkout_step?("payment") && @order.payment?
         if params[:payment_source].present?
-          source_params = params.delete(:payment_source)[non_wallet_payment_attributes(params[:order][:payments_attributes]).first[:payment_method_id].underscore]
+          source_params = params.delete(:payment_source)[non_wallet_payment_attributes(params[:order][:payments_attributes]).first.try(:payment_method_id)]
 
           if source_params
             non_wallet_payment_attributes(params[:order][:payments_attributes]).first[:source_attributes] = source_params
