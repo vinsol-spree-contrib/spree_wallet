@@ -5,7 +5,7 @@ Spree::CheckoutController.class_eval do
     def object_params
       if @order.has_checkout_step?("payment") && @order.payment?
         if params[:payment_source].present?
-          source_params = params.delete(:payment_source)[non_wallet_payment_attributes(params[:order][:payments_attributes]).first.try(:payment_method_id)]
+          source_params = params.delete(:payment_source)[non_wallet_payment_method]
 
           if source_params
             non_wallet_payment_attributes(params[:order][:payments_attributes]).first[:source_attributes] = source_params
@@ -37,6 +37,10 @@ Spree::CheckoutController.class_eval do
         flash[:error] = Spree.t(:not_sufficient_amount_in_wallet)
         redirect_to checkout_state_path(@order.state)
       end
+    end
+
+    def non_wallet_payment_method
+      non_wallet_payment_attributes(params[:order][:payments_attributes]).first[:payment_method_id] if non_wallet_payment_attributes(params[:order][:payments_attributes]).first
     end
 
     def remaining_order_total_after_wallet(order, wallet_payments)
