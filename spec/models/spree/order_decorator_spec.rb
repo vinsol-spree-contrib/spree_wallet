@@ -15,6 +15,36 @@ describe Spree::Order do
     it { should eq(order.total - order.payment_total) }
   end
 
+  describe 'other_than_wallet_payment_required?' do
+    subject { order.other_than_wallet_payment_required? }
+    context 'when order remaining total > store_credits_total' do
+      before(:each) do
+        user.store_credits_total = order.remaining_total - 100
+        user.save!
+      end
+
+      it { should be_true }
+    end
+
+    context 'when order remaining total < store_credits_total' do
+      before(:each) do
+        user.store_credits_total = order.remaining_total + 100
+        user.save!
+      end
+
+      it { should be_false }
+    end
+
+    context 'when order remaining total = store_credits_total' do
+      before(:each) do
+        user.store_credits_total = order.remaining_total
+        user.save!
+      end
+
+      it { should be_false }
+    end
+  end
+
   describe '#user_or_by_email' do
     subject { order.user_or_by_email }
     let(:user1) { Spree::User.create!(:email => 'test123@testmail.com', :password => '123456') { |user| user.store_credits_total = 200 } }

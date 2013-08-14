@@ -18,4 +18,8 @@ Spree::Order.class_eval do
   def available_wallet_payment_method
     @wallet_payment_method ||= available_payment_methods.select { |p| p.is_a? Spree::PaymentMethod::Wallet }.first
   end
+
+  def other_than_wallet_payment_required?
+    remaining_total > user.store_credits_total
+  end
 end
