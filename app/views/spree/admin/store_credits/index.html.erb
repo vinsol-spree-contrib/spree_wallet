@@ -3,7 +3,7 @@
 <% content_for :table_filter do %>
   <div data-hook="admin_store_credits_sidebar">
 
-    <%= search_form_for [:admin, @user, @search] do |f| %>
+    <%= search_form_for [:admin, @search] do |f| %>
       <div data-hook="admin_store_credits_index_search">
         <div class="alpha nine columns">
           <div class="field">
@@ -37,6 +37,7 @@
 <% content_for :page_title do %>
   <% if @user %>
     <%= Spree.t(:store_credits_for_user_email, user_email: @user.email) %>
+    <%= Spree.t(:current_balance, total: @user.store_credits_total) %>
   <% else %>
     <%= Spree.t(:listing_store_credits) %>
   <% end %>
@@ -81,8 +82,10 @@
         <td class="align-center"><%= store_credit.transactioner.try(:email) %></td>
         <td class="align-center"><%= number_to_currency store_credit.amount %></td>
         <td class="align-center"><%= number_to_currency store_credit.balance %></td>
-        <td class="align-center"><%= store_credit.reason %></td>
-        <td class="align-center"><%= store_credit.class::PAYMENT_MODE.key(store_credit.payment_mode) %>
+        <% if @user %>
+          <td class="align-center"><%= store_credit.reason %></td>
+          <td class="align-center"><%= store_credit.class::PAYMENT_MODE.key(store_credit.payment_mode) %>
+        <% end %>
         <td class="align-center"><%= store_credit.type.demodulize %></td>
         <% unless @user %>
           <td><%= link_to Spree.t(:credit), new_admin_user_credit_path(:user_id => store_credit.user) %> | <%= link_to Spree.t(:debit), new_admin_user_debit_path(:user_id => store_credit.user) %> | <%= link_to Spree.t(:view), admin_user_store_credits_path(:user_id => store_credit.user) %></td>

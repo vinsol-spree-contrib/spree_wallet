@@ -5,6 +5,7 @@
 <%= render 'spree/shared/error_messages', :target => @store_credit %>
 
 <h3 data-hook='user-email'>User Email: <%= @store_credit.user.email %></h3>
+<h4 data-hook='user-email'>Current Balance: <%= @store_credit.user.store_credits_total %></h4>
 
 <%= form_for [:admin, @user, @store_credit], :as => :store_credit do |f| %>
   <%= f.field_container :amount do %>

@@ -76,8 +76,8 @@ describe Spree::Admin::StoreCreditsController do
     end
 
     context 'when there is parent' do
-      it 'should receive parent twice and return user' do
-        controller.should_receive(:parent).twice.and_return(user)
+      it 'should receive parent exactly three times and return user' do
+        controller.should_receive(:parent).exactly(3).times.and_return(user)
         send_request
       end
 
@@ -85,26 +85,16 @@ describe Spree::Admin::StoreCreditsController do
         user.should_receive(:store_credits).and_return(store_credits)
         send_request
       end
-
-      it 'should receive includes on store_credits' do
-        store_credits.should_receive(:includes).with(:transactioner).and_return(store_credits)
-        send_request
-      end
     end
 
     context 'when there is no parent' do
       before(:each) do
         controller.stub(:parent).and_return(nil)
-        Spree::StoreCredit.stub(:includes).with(:user, :transactioner).and_return(store_credits)
+        Spree::StoreCredit.stub(:ransack).and_return(ransack_search)
       end
 
       it 'should receive parent and return nil' do
         controller.should_receive(:parent).and_return(nil)
-        send_request
-      end
-
-      it 'should receive includes on Spree::StoreCredit with user' do
-        Spree::StoreCredit.should_receive(:includes).with(:user, :transactioner).and_return(store_credits)
         send_request
       end
     end
@@ -137,6 +127,35 @@ describe Spree::Admin::StoreCreditsController do
     it 'should receive page and return store_credits' do
       store_credits.should_receive(:page).with("1").and_return(store_credits)
       send_request(:page => 1)
+    end
+
+    context 'when there is parent' do
+      it 'should receive required_includes_arguements and return :transactioner' do
+        controller.should_receive(:required_includes_arguements).and_return(:transactioner)
+        send_request(:page => 1)
+      end
+
+      it 'should receive includes :transactioner' do
+        store_credits.should_receive(:includes).with(:transactioner).and_return(store_credits)
+        send_request(:page => 1)
+      end
+    end
+
+    context 'when there is no parent' do
+      before(:each) do
+        controller.stub(:parent).and_return(nil)
+        Spree::StoreCredit.stub(:ransack).and_return(ransack_search)
+      end
+
+      it 'should receive required_includes_arguements and return :transactioner' do
+        controller.should_receive(:required_includes_arguements).and_return([:transactioner, :user])
+        send_request(:page => 1)
+      end
+
+      it 'should receive includes [:transactioner, :user]' do
+        store_credits.should_receive(:includes).with([:transactioner, :user]).and_return(store_credits)
+        send_request(:page => 1)
+      end
     end
 
     it 'should assign @store_credits with store_credits' do

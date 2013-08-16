@@ -7,7 +7,7 @@ module Spree
 
       def index
         @search = association_or_class.ransack(params[:q])
-        @store_credits = @search.result.page(params[:page])
+        @store_credits = @search.result.page(params[:page]).includes(required_includes_arguements)
       end
 
       protected
@@ -25,7 +25,11 @@ module Spree
         end
 
         def association_or_class
-          parent ? parent.store_credits.includes(:transactioner) : Spree::StoreCredit.includes(:user, :transactioner)
+          parent ? parent.store_credits : Spree::StoreCredit
+        end
+
+        def required_includes_arguements
+          parent ? :transactioner : [:transactioner, :user]
         end
 
         def build_resource
