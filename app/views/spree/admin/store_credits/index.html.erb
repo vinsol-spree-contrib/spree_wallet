@@ -36,8 +36,7 @@
 
 <% content_for :page_title do %>
   <% if @user %>
-    <%= Spree.t(:store_credits_for_user_email, user_email: @user.email) %>
-    <%= Spree.t(:current_balance, total: @user.store_credits_total) %>
+    <%= Spree.t(:store_credits_for_user_email, user_email: @user.email) %> (<%= Spree.t(:current_balance_for_user, total: @user.store_credits_total) %>)
   <% else %>
     <%= Spree.t(:listing_store_credits) %>
   <% end %>
@@ -64,8 +63,10 @@
       <th><%= sort_link @search, :transactioner_email, Spree.t(:transactioner_email) %></th>
       <th><%= sort_link @search, :amount, Spree.t(:amount) %></th>
       <th><%= sort_link @search, :balance, Spree.t(:balance) %></th>
-      <th><%= Spree.t(:reason) %></th>
-      <th><%= Spree.t(:payment_mode) %></th>
+      <% if @user %>
+        <th><%= Spree.t(:reason) %></th>
+        <th><%= Spree.t(:payment_mode) %></th>
+      <% end %>
       <th><%= sort_link @search, :type, Spree.t(:type) %></th>
       <% unless @user %>
         <th><%= Spree.t(:action) %></th>
