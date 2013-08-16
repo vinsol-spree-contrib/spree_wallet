@@ -18,3 +18,4 @@ en:
     cannot_select_wallet_while_guest_checkout: "Payment Method Wallet can't be selected while guest checkout."
     wallet_not_linked_to_user: "There is no wallet linked to the user of this order"
     current_balance_for_user: "Current Balance: %{total}"
+    store_credits_total: "Store Credits Total"
