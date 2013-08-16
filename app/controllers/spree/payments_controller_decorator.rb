@@ -27,7 +27,7 @@ Spree::Admin::PaymentsController.class_eval do
       end
 
     rescue Spree::Core::GatewayError => e
-      flash[:error] = "#{e.message} abcd"
+      flash[:error] = "#{e.message}"
       redirect_to new_admin_order_payment_path(@order)
     end
   end
