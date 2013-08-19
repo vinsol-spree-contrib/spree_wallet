@@ -15,6 +15,86 @@ describe Spree::Order do
     it { should eq(order.total - order.payment_total) }
   end
 
+  describe 'available_wallet_payment_amount' do
+    subject { order.available_wallet_payment_amount }
+    context 'when order has less remaining_total' do
+      before(:each) do
+        user.store_credits_total = order.remaining_total - 100
+        user.save!
+      end
+
+      it { should eq(user.store_credits_total) }
+    end
+    context 'when order\'user has less store_credits_total' do
+      before(:each) do
+        user.store_credits_total = order.remaining_total + 100
+        user.save!
+      end
+
+      it { should eq(order.remaining_total) }
+    end
+  end
+
+  describe 'remaining_total_after_wallet' do
+    subject { order.remaining_total_after_wallet }
+    context 'when order has less remaining_total' do
+      before(:each) do
+        user.store_credits_total = order.remaining_total - 100
+        user.save!
+      end
+
+      it { should eq(order.remaining_total - user.store_credits_total) }
+    end
+    context 'when order\'user has less store_credits_total' do
+      before(:each) do
+        user.store_credits_total = order.remaining_total + 100
+        user.save!
+      end
+
+      it { should eq(0.0) }
+    end
+  end
+
+  describe 'display_available_wallet_payment_amount' do
+    subject { order.display_available_wallet_payment_amount.to_html }
+    context 'when order has less remaining_total' do
+      before(:each) do
+        user.store_credits_total = order.remaining_total - 100
+        user.save!
+      end
+      
+      it { should eq(Spree::Money.new(user.store_credits_total).to_html) }
+    end
+    context 'when order\'user has less store_credits_total' do
+      before(:each) do
+        user.store_credits_total = order.remaining_total + 100
+        user.save!
+      end
+
+      it { should eq(Spree::Money.new(order.remaining_total).to_html) }
+    end
+  end
+
+  describe 'display_remaining_total_after_wallet' do
+    subject { order.display_remaining_total_after_wallet.to_html }
+    context 'when order has less remaining_total' do
+      before(:each) do
+        user.store_credits_total = order.remaining_total - 100
+        user.save!
+      end
+      
+      it { should eq(Spree::Money.new(order.remaining_total - user.store_credits_total).to_html) }
+    end
+    context 'when order\'user has less store_credits_total' do
+      before(:each) do
+        user.store_credits_total = order.remaining_total + 100
+        user.save!
+      end
+
+      it { should eq(Spree::Money.new(0.0).to_html) }
+    end
+  end
+
   describe 'other_than_wallet_payment_required?' do
     subject { order.other_than_wallet_payment_required? }
     context 'when order remaining total > store_credits_total' do

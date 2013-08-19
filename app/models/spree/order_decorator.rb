@@ -22,4 +22,20 @@ Spree::Order.class_eval do
   def other_than_wallet_payment_required?
     remaining_total > user.store_credits_total
   end
+
+  def available_wallet_payment_amount
+    [remaining_total, user_or_by_email.store_credits_total].min
+  end
+
+  def display_available_wallet_payment_amount
+    Spree::Money.new(available_wallet_payment_amount)
+  end
+
+  def remaining_total_after_wallet
+    remaining_total -  available_wallet_payment_amount
+  end
+
+  def display_remaining_total_after_wallet
+    Spree::Money.new(remaining_total_after_wallet)
+  end
 end
