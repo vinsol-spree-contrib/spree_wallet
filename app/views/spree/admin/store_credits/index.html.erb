@@ -13,13 +13,13 @@
 
           <div class="field">
             <%= f.label :transactioner_email_cont, Spree.t(:transactioner_email) %>
-            <%= f.text_field :transactioner_email_cont %>
+            <%= f.email_field :transactioner_email_cont %>
           </div>
 
           <% unless @user %>
             <div class="field">
               <%= f.label :user_email_cont, Spree.t(:user_email) %>
-              <%= f.text_field :user_email_cont %>
+              <%= f.email_field :user_email_cont %>
             </div>
           <% end %>
         </div>
