@@ -49,7 +49,6 @@ describe Spree::Payment do
       subject { check_payment }
       context 'amount_changed?' do
         it { should validate_numericality_of(:amount).is_less_than_or_equal_to(check_payment.order_remaining_total) }
-        it { should validate_numericality_of(:amount).is_greater_than_or_equal_to(0.0) }
       end
 
       context 'amount_not_changed' do
