@@ -1,4 +1,7 @@
 Spree::Order.class_eval do
+  fsm = self.state_machines[:state]
+  fsm.after_transition :to => [:canceled], :do => :make_wallet_payments_void
+
   def user_or_by_email
     user ? user : Spree::User.where(:email => email).first
   end
@@ -38,4 +41,13 @@ Spree::Order.class_eval do
   def display_remaining_total_after_wallet
     Spree::Money.new(remaining_total_after_wallet)
   end
+
+  private
+    def make_wallet_payments_void
+      wallet_payments.each { |p| p.void! if p.can_void? }
+    end
+
+    def wallet_payments
+      payments.where(:payment_method_id => Spree::PaymentMethod::Wallet.pluck(:id))
+    end
 end

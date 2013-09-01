@@ -8,11 +8,72 @@ describe Spree::Order do
   before(:each) do
     order.update_column(:total, 1000)
     order.update_column(:payment_total, 200)
+    @shipping_category = Spree::ShippingCategory.create!(:name => 'test')
+    @stock_location = Spree::StockLocation.create! :name => 'test' 
+    @product = Spree::Product.create!(:name => "product", :price => 100) { |p| p.shipping_category = @shipping_category }
+    @stock_item = @product.master.stock_items.first
+    @stock_item.adjust_count_on_hand(10)
+    @stock_item.save!
+
+    order.line_items.create! :variant_id => @product.master.id, :quantity => 1
   end
 
   describe 'remaining_total' do
     subject { order.remaining_total }
     it { should eq(order.total - order.payment_total) }
+  end
+
+  describe 'order cancel' do
+    before(:each) do
+      order.email = user.email
+      @country = Spree::Country.where(:name => 'United States', :iso_name => 'US').first_or_create!
+      @state = Spree::State.create!({:name => "Michigan", :abbr => "MI", :country => @country}, :without_protection => true)
+      @address = Spree::Address.create!({:firstname => 'first name', :lastname => 'lastname', :address1 => 'address1', :address2 => 'address2', :city => 'abcd', :state => @state, :country => @country, :phone => '1234', :zipcode => '123456'}, :without_protection => true)
+      order.bill_address = order.ship_address = @address
+      order.save!
+      order.stub(:ensure_available_shipping_rates).and_return(true)
+
+      @check_payment = order.payments.create!(:amount => 100, :payment_method_id => check_payment_method.id) { |p| p.state = 'checkout' }
+      @wallet_payment = order.payments.create!(:amount => 100, :payment_method_id => wallet_payment_method.id) { |p| p.state = 'checkout' }
+      order.next! until order.completed?
+      @check_payment.complete!
+      @payments = [@check_payment, @wallet_payment]
+      order.stub(:payments).and_return(@payments)
+      @payments.stub(:where).with(:payment_method_id => Spree::PaymentMethod::Wallet.pluck(:id)).and_return([@wallet_payment])
+    end
+
+    it 'should_receive make_wallet_payments_void' do
+      order.should_receive(:make_wallet_payments_void).and_return(true)
+      order.cancel!
+    end
+
+    describe 'make_wallet_payments_void' do
+      it 'should not make other than wallet_payments void' do
+        order.cancel!
+        @check_payment.should_not be_void
+      end
+
+      it 'should make wallet_payments void' do
+        order.cancel!
+        @wallet_payment.should be_void
+      end
+    end
+
+    describe 'wallet_payments' do
+      it 'should give only wallet_payments' do
+        order.wallet_payments.should eq([@wallet_payment])
+      end
+
+      it 'should receive payments and return @payments' do
+        order.should_receive(:payments).and_return(@payments)
+        order.wallet_payments
+      end
+
+      it 'should receive where on payments' do
+        @payments.should_receive(:where).with(:payment_method_id => Spree::PaymentMethod::Wallet.pluck(:id)).and_return(@payments)
+        order.wallet_payments
+      end
+    end
   end
 
   describe 'available_wallet_payment_amount' do
