@@ -6,6 +6,10 @@ Spree::Order.class_eval do
     user ? user : Spree::User.where(:email => email).first
   end
 
+  def make_wallet_payments_void
+    wallet_payments.each { |p| p.void! if p.can_void? }
+  end
+
   def has_unprocessed_payments?
     payments.with_state('checkout').reload.exists? || (available_wallet_payment_method.present? && (wallet_payment = payments.where(:payment_method_id => available_wallet_payment_method.id).last).present? && wallet_payment.amount <= remaining_total)
   end
@@ -43,10 +47,6 @@ Spree::Order.class_eval do
   end
 
   private
-    def make_wallet_payments_void
-      wallet_payments.each { |p| p.void! if p.can_void? }
-    end
-
     def wallet_payments
       payments.where(:payment_method_id => Spree::PaymentMethod::Wallet.pluck(:id))
     end
