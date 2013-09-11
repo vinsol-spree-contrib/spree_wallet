@@ -24,6 +24,13 @@ describe Spree::StoreCredit do
     it { should_not allow_mass_assignment_of :type }
   end
 
+  describe 'order_created_at_desc' do
+    let(:store_credit1) { Spree::Credit.create!(:amount => 123, :reason => 'test reason', :payment_mode => 0) { |store_credit| store_credit.user = user; store_credit.created_at = Time.current + 1.hour }}
+    let(:store_credit2) { Spree::Credit.create!(:amount => 123, :reason => 'test reason', :payment_mode => 0) { |store_credit| store_credit.user = user; store_credit.created_at = Time.current }}
+
+    it { Spree::StoreCredit.order_created_at_desc.should eq([store_credit1, store_credit2]) }
+  end
+
   describe 'validations' do
     describe 'presence' do
       it { should validate_presence_of :amount }

@@ -54,6 +54,7 @@ describe Spree::Admin::StoreCreditsController do
     before(:each) do
       controller.stub(:parent).and_return(user)
       user.stub(:store_credits).and_return(store_credits)
+      store_credits.stub(:order_created_at_desc).and_return(store_credits)
       store_credits.stub(:ransack).and_return(ransack_search)
       controller.stub(:authorize_admin).and_return(true)
       ransack_search.stub(:result).and_return(store_credits)
@@ -67,6 +68,11 @@ describe Spree::Admin::StoreCreditsController do
 
     it 'should receive association_or_class and return store_credits' do
       controller.should_receive(:association_or_class).and_return(store_credits)
+      send_request
+    end
+
+    it 'should receive order_created_at_desc and return store_credits' do
+      store_credits.should_receive(:order_created_at_desc).and_return(store_credits)
       send_request
     end
 
