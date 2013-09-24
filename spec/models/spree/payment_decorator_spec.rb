@@ -49,7 +49,6 @@ describe Spree::Payment do
       subject { check_payment }
       context 'amount_changed?' do
         it { should validate_numericality_of(:amount).is_less_than_or_equal_to(check_payment.order_remaining_total) }
-        it { should validate_numericality_of(:amount).is_greater_than_or_equal_to(0.0) }
       end
 
       context 'amount_not_changed' do
@@ -66,7 +65,6 @@ describe Spree::Payment do
       context 'when amount_changed? and has order_user_or_by_email' do
         context 'when payment.order_remaining_total is min' do
           it { should validate_numericality_of(:amount).is_less_than_or_equal_to(wallet_payment.order_remaining_total) }
-          it { should validate_numericality_of(:amount).is_greater_than_or_equal_to(0.0) }
         end
 
         context 'when user.store_credits_total is min' do
@@ -77,7 +75,6 @@ describe Spree::Payment do
           end
 
           it { should validate_numericality_of(:amount).is_less_than_or_equal_to(user.store_credits_total) }
-          it { should validate_numericality_of(:amount).is_greater_than_or_equal_to(0.0) }
         end 
       end
     end

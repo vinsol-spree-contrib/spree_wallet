@@ -1,3 +1,5 @@
+require 'spec_helper'
+
 describe Spree::Order do
   let(:user) { Spree::User.create!(:email => 'test@testmail.com', :password => '123456') { |user| user.store_credits_total = 200 }}
   let(:order) { Spree::Order.create! { |order| order.user = user }}
@@ -39,6 +41,7 @@ describe Spree::Order do
       @check_payment.complete!
       @payments = [@check_payment, @wallet_payment]
       order.stub(:payments).and_return(@payments)
+      @payments.stub(:completed).and_return(@payments)
       @payments.stub(:where).with(:payment_method_id => Spree::PaymentMethod::Wallet.pluck(:id)).and_return([@wallet_payment])
     end
 
@@ -61,17 +64,17 @@ describe Spree::Order do
 
     describe 'wallet_payments' do
       it 'should give only wallet_payments' do
-        order.wallet_payments.should eq([@wallet_payment])
+        order.send(:wallet_payments).should eq([@wallet_payment])
       end
 
       it 'should receive payments and return @payments' do
         order.should_receive(:payments).and_return(@payments)
-        order.wallet_payments
+        order.send(:wallet_payments)
       end
 
       it 'should receive where on payments' do
         @payments.should_receive(:where).with(:payment_method_id => Spree::PaymentMethod::Wallet.pluck(:id)).and_return(@payments)
-        order.wallet_payments
+        order.send(:wallet_payments)
       end
     end
   end

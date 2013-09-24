@@ -206,7 +206,7 @@ describe Spree::CheckoutController do
         context 'when there are source_params' do
           it 'should assign it to first in payment_attributes' do
             send_request(:payment_source => { wallet_payment_method.id.to_s => source_params}, :order => { :payments_attributes => [:payment_method_id => wallet_payment_method.id.to_s, :source_attributes => another_source_params]})
-            controller.send(:params)[:order][:payments_attributes].first[:source_attributes].should eq(source_params)
+            controller.send(:params)[:order][:payments_attributes].first[:source_attributes].should eq(another_source_params)
           end
         end
 
@@ -227,7 +227,7 @@ describe Spree::CheckoutController do
         context 'when there are source_params' do
           it 'should assign it to first in payment_attributes' do
             send_request(:payment_source => { wallet_payment_method.id.to_s => source_params}, :order => { :payments_attributes => [:payment_method_id => wallet_payment_method.id.to_s, :source_attributes => another_source_params]})
-            controller.send(:params)[:order][:payments_attributes].first[:source_attributes].should eq(source_params)
+            controller.send(:params)[:order][:payments_attributes].first[:source_attributes].should eq(another_source_params)
           end
         end
 
