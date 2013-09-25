@@ -1,8 +1,6 @@
 SpreeWallet
 ===========
 
-Introduction goes here.
-
 Installation
 ------------
 
