@@ -8,8 +8,8 @@ Spree::Payment.class_eval do
   delegate :remaining_total, :user_or_by_email, :to => :order, :prefix => true, :allow_nil => true
 
   fsm = self.state_machines[:state]
-  fsm.after_transition :from => fsm.states.map(&:name) - ['completed'], :to => ['completed'], :do => :consume_user_credits, :if => :wallet?
-  fsm.after_transition :from => ['completed'], :to => fsm.states.map(&:name) - ['completed'] , :do => :release_user_credits, :if => :wallet?
+  fsm.after_transition :from => fsm.states.map(&:name) - [:completed], :to => [:completed], :do => :consume_user_credits, :if => :wallet?
+  fsm.after_transition :from => [:completed], :to => fsm.states.map(&:name) - [:completed] , :do => :release_user_credits, :if => :wallet?
 
   def wallet?
     payment_method.is_a? Spree::PaymentMethod::Wallet
