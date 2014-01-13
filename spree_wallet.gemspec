@@ -9,7 +9,9 @@ Gem::Specification.new do |s|
 
   s.author    = "Nishant 'CyRo' Tuteja"
   s.email     = 'info@vinsol.com'
-  s.homepage  = 'http://vinsol.com'
+  s.homepage  = 'https://github.com/vinsol/spree_wallet'
+  s.license   = "MIT"
+
   s.require_path = 'lib'
   s.requirements << 'none'
 
