@@ -2,14 +2,14 @@
 Gem::Specification.new do |s|
   s.platform    = Gem::Platform::RUBY
   s.name        = 'spree_wallet'
-  s.version     = '2.0.5'
+  s.version     = '2.0.6'
   s.summary     = 'Add payment method wallet to spree'
   s.description = 'Add wallet payment method functionality to spree'
   s.required_ruby_version = '>= 1.9.3'
 
   s.author    = "Nishant 'CyRo' Tuteja"
   s.email     = 'info@vinsol.com'
-  s.homepage  = 'https://github.com/vinsol/spree_wallet'
+  s.homepage  = 'http://vinsol.com'
   s.license   = "MIT"
 
   s.require_path = 'lib'
