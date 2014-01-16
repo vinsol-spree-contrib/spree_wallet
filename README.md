@@ -8,7 +8,9 @@ Add spree_wallet to your Gemfile:
 
 ```ruby
 
-gem 'spree_wallet'
+gem 'spree_wallet', :git => 'git://github.com/vinsol/spree_wallet.git'
+                 OR
+gem 'spree_wallet', '~> 2.0.6'
 ```
 
 Bundle your dependencies and run the installation generator:
