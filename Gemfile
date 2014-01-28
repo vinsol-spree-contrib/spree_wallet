@@ -2,6 +2,7 @@ source 'https://rubygems.org'
 
 gem 'json'
 gem 'mysql2'
+gem 'sqlite3'
 gem 'multi_json', '1.2.0'
 # Gems used only for assets and not required
 # in production environments by default.
@@ -11,6 +12,7 @@ group :assets do
 end
 
 group :test do
+  gem 'simplecov'
   gem 'rspec-rails', '~> 2.12.0'
   gem 'factory_girl_rails', '~> 4.2.1'
   gem 'email_spec', '~> 1.2.1'
@@ -19,12 +21,11 @@ group :test do
   gem 'shoulda-matchers', '~> 2.2.0'
   gem 'capybara', '~> 2.1'
   gem 'database_cleaner', '0.9.1'
-  gem 'selenium-webdriver', '2.32.0'
   gem 'launchy'
  # gem 'debugger'
 end
 
-gem 'spree', '~> 2.0'
+gem 'spree', '2.0.3'
 
 # Provides basic authentication functionality for testing parts of your engine
 gem 'spree_auth_devise', github: 'spree/spree_auth_devise', branch: '2-0-stable'

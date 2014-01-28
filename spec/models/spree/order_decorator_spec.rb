@@ -41,6 +41,9 @@ describe Spree::Order do
       @check_payment.complete!
       @payments = [@check_payment, @wallet_payment]
       order.stub(:payments).and_return(@payments)
+      @payments.stub(:with_state).and_return(@payments)
+      @payments.stub(:reload).and_return(@payments)
+      @payments.stub(:exists?).and_return(@payments)
       @payments.stub(:completed).and_return(@payments)
       @payments.stub(:where).with(:payment_method_id => Spree::PaymentMethod::Wallet.pluck(:id)).and_return([@wallet_payment])
     end
