@@ -36,4 +36,11 @@ Then run the rspec tests with mysql.
 
     bundle exec rspec .
 
-Copyright (c) 2014 Vinsol, released under the New MIT License
+
+
+Credits
+-------
+
+[![vinsol.com: Ruby on Rails, iOS and Android developers](http://vinsol.com/vin_logo.png "Ruby on Rails, iOS and Android developers")](http://vinsol.com)
+
+Copyright (c) 2014 [vinsol.com](http://vinsol.com "Ruby on Rails, iOS and Android developers"), released under the New MIT License
