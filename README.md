@@ -1,4 +1,4 @@
-SpreeWallet  [![Code Climate](https://codeclimate.com/github/vinsol/spree_wallet.png)](https://codeclimate.com/github/vinsol/spree_wallet)
+SpreeWallet  [![Code Climate](https://codeclimate.com/github/vinsol/spree_wallet.png)](https://codeclimate.com/github/vinsol/spree_wallet) [![Build Status](https://travis-ci.org/vinsol/spree_wallet.png?branch=master)](https://travis-ci.org/vinsol/spree_wallet)
 ===========
 
 Installation
