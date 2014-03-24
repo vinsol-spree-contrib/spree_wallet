@@ -16,7 +16,7 @@ describe Spree::Admin::StoreCreditsController do
     let(:store_credit) { Spree::StoreCredit.new }
 
     def send_request(type = nil)
-      post :create, :user_id => user.id, :type => type, :use_route => 'spree'
+      post :create, { :store_credit => { :amount => 1000 }, :user_id => user.id, :type => type, :use_route => 'spree' }
     end
 
     before(:each) do

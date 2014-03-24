@@ -29,8 +29,8 @@ describe Spree::Order do
     before(:each) do
       order.email = user.email
       @country = Spree::Country.where(:name => 'United States', :iso_name => 'US').first_or_create!
-      @state = Spree::State.create!({:name => "Michigan", :abbr => "MI", :country => @country}, :without_protection => true)
-      @address = Spree::Address.create!({:firstname => 'first name', :lastname => 'lastname', :address1 => 'address1', :address2 => 'address2', :city => 'abcd', :state => @state, :country => @country, :phone => '1234', :zipcode => '123456'}, :without_protection => true)
+      @state = Spree::State.create!(:name => "Michigan", :abbr => "MI", :country => @country)
+      @address = Spree::Address.create!(:firstname => 'first name', :lastname => 'lastname', :address1 => 'address1', :address2 => 'address2', :city => 'abcd', :state => @state, :country => @country, :phone => '1234', :zipcode => '123456')
       order.bill_address = order.ship_address = @address
       order.save!
       order.stub(:ensure_available_shipping_rates).and_return(true)

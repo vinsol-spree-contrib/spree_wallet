@@ -13,17 +13,6 @@ describe Spree::StoreCredit do
 
   subject { store_credit }
 
-  describe 'mass_assignment' do
-    it { should allow_mass_assignment_of :amount }
-    it { should allow_mass_assignment_of :reason }
-    it { should allow_mass_assignment_of :payment_mode }
-
-    it { should_not allow_mass_assignment_of :user_id }
-    it { should_not allow_mass_assignment_of :transaction_id }
-    it { should_not allow_mass_assignment_of :balance }
-    it { should_not allow_mass_assignment_of :type }
-  end
-
   describe 'order_created_at_desc' do
     let(:store_credit1) { Spree::Credit.create!(:amount => 123, :reason => 'test reason', :payment_mode => 0) { |store_credit| store_credit.user = user; store_credit.created_at = Time.current + 1.hour }}
     let(:store_credit2) { Spree::Credit.create!(:amount => 123, :reason => 'test reason', :payment_mode => 0) { |store_credit| store_credit.user = user; store_credit.created_at = Time.current }}
@@ -91,13 +80,10 @@ describe Spree::StoreCredit do
   end
 
   describe 'multiple request' do
-    context 'concurrent' do
-      before(:each) do
-        @user = spree_users(:user1)
-      end
-
+    context 'concurrent' do      
       it 'should have 900 store_credits_total and 1 store_credit' do
         pending 'need to fix it with sqlite'
+        @user = spree_users(:user1)
         config = ActiveRecord::Base.remove_connection
 
         pids = (1..5).to_a.enum_for(:each_with_index).collect do |i|
