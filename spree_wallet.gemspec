@@ -2,7 +2,7 @@
 Gem::Specification.new do |s|
   s.platform    = Gem::Platform::RUBY
   s.name        = 'spree_wallet'
-  s.version     = '2.1.0'
+  s.version     = '2.1.1'
   s.summary     = 'Add payment method wallet to spree'
   s.description = 'Add wallet payment method functionality to spree'
   s.required_ruby_version = '>= 1.9.3'
