@@ -10,6 +10,8 @@ describe Spree::CheckoutController do
     user.stub(:generate_spree_api_key!).and_return(true)
     user.stub(:last_incomplete_spree_order).and_return(nil)
     order.stub(:token).and_return(1000)
+    order.stub(:update_from_params).and_return({})
+    order.stub(:checkout_steps).and_return([])
   end
 
   describe '#update' do
