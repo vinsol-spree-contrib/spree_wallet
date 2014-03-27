@@ -7,10 +7,7 @@ Installation
 Add spree_wallet to your Gemfile:
 
 ```ruby
-
-gem 'spree_wallet', :git => 'git://github.com/vinsol/spree_wallet.git'
-                 OR
-gem 'spree_wallet', '~> 2.0.6'
+gem 'spree_wallet', '2.0.9'
 ```
 
 Bundle your dependencies and run the installation generator:
@@ -28,12 +25,33 @@ From Admin end, create a payment method of Wallet type. From User end, user can 
 
 While from admin end, Admin can select any amount from wallet, but it should be less than amount present in user's balance. 
 
-## Contribution
+## Testing
 
 You need to do a quick one-time creation of a test application and then you can use it to run the tests.
 
-    bundle exec rake test_app
-
+```
+bundle exec rake test_app
+````
 Then run the rspec tests with mysql.
 
-    bundle exec rspec .
+```
+bundle exec rspec .
+```
+
+Contributing
+------------
+
+1. Fork the repo.
+2. Clone your repo.
+3. Run `bundle install`.
+4. Run `bundle exec rake test_app` to create the test application in `spec/test_app`.
+5. Make your changes.
+6. Ensure specs pass by running `bundle exec rspec spec`.
+7. Submit your pull request.
+
+Credits
+-------
+
+[![vinsol.com: Ruby on Rails, iOS and Android developers](http://vinsol.com/vin_logo.png "Ruby on Rails, iOS and Android developers")](http://vinsol.com)
+
+Copyright (c) 2014 [vinsol.com](http://vinsol.com "Ruby on Rails, iOS and Android developers"), released under the New MIT License
