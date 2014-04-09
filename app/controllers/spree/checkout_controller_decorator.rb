@@ -1,32 +1,7 @@
 Spree::CheckoutController.class_eval do
   before_filter :validate_payments, :only => :update, :if => lambda { @order && @order.has_checkout_step?("payment") && @order.payment? && @order.available_wallet_payment_method }
-
+  
   private
-    def object_params
-      if @order.has_checkout_step?("payment") && @order.payment?
-        if params[:payment_source].present?
-          source_params = params.delete(:payment_source)[non_wallet_payment_method]
-
-          if source_params
-            non_wallet_payment_attributes(params[:order][:payments_attributes]).first[:source_attributes] = source_params
-          end
-        end
-
-        if (params[:order][:payments_attributes])
-          # This method is overrided because spree add all order total in first payment, now after wallet we can have multiple payments.
-          if spree_current_user && @order.available_wallet_payment_method
-            wallet_payments = wallet_payment_attributes(params[:order][:payments_attributes])
-            wallet_payments.first[:amount] = [@order.remaining_total, spree_current_user.store_credits_total].min if wallet_payments.present?
-            params[:order][:payments_attributes] = wallet_payments if remaining_order_total_after_wallet(@order, wallet_payments) <= 0
-            non_wallet_payment_attributes(params[:order][:payments_attributes]).first[:amount] = remaining_order_total_after_wallet(@order, wallet_payments) if non_wallet_payment_attributes(params[:order][:payments_attributes]).present?
-          else
-            params[:order][:payments_attributes].first[:amount] = @order.remaining_total
-          end
-        end
-      end
-      params[:order]
-    end
-
     def validate_payments
       payments_attributes = params[:order][:payments_attributes]
       wallet_payment = wallet_payment_attributes(payments_attributes)
