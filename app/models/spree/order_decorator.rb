@@ -46,11 +46,11 @@ Spree::Order.class_eval do
     Spree::Money.new(remaining_total_after_wallet)
   end
 
-  def process_payments!
+  def process_payments!    
     if pending_payments.empty? && wallet_payments.empty?
-      raise Core::GatewayError.new Spree.t(:no_pending_payments)
+      raise Spree::Core::GatewayError.new Spree.t(:no_pending_payments)
     else
-      pending_payments.each do |payment|
+      [pending_payments, wallet_payments].flatten.each do |payment|
         break if payment_total >= total
 
         payment.process!
@@ -60,10 +60,11 @@ Spree::Order.class_eval do
         end
       end
     end
-  rescue Core::GatewayError => e
+  rescue Spree::Core::GatewayError => e
     result = !!Spree::Config[:allow_checkout_on_gateway_error]
     errors.add(:base, e.message) and return result
   end
+
 
   ### This methods are extensions of spree/order/checkout.rb
 
