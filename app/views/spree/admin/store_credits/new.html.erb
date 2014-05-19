@@ -9,17 +9,17 @@
 
 <%= form_for [:admin, @user, @store_credit], :as => :store_credit do |f| %>
   <%= f.field_container :amount do %>
-    <%= f.label :amount %><br />
+    <%= f.label :amount %>*<br />
     <%= f.text_field :amount, :id => "debit_credit_amount" %>
   <% end %>
 
   <%= f.field_container :payment_mode do %>
-    <%= f.label :payment_mode, 'Payment Mode' %><br />
+    <%= f.label :payment_mode, 'Payment Mode' %>*<br />
     <%= f.select :payment_mode, store_credit_class::PAYMENT_MODE.select { |key, value| value >= 0 }, { :prompt => 'Select' } %>
   <% end %>
 
   <%= f.field_container :reason do %>
-    <%= f.label :reason %><br />
+    <%= f.label :reason %>*<br />
     <%= f.text_field :reason %>
   <% end %>
 
