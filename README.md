@@ -7,12 +7,18 @@ Installation
 Add spree_wallet to your Gemfile:
 
 ```ruby
-gem 'spree_wallet', '~> 2.1.0'
+gem 'spree_wallet'
 ```
 
-But if you are using 2.0.x version of spree
+But if you are using older version of spree
 
 ```ruby
+# Spree 2.1.x
+gem 'spree_wallet', '2.1.0'
+```
+
+```ruby
+# Spree 2.0.x
 gem 'spree_wallet', '2.0.6'
 ```
 
