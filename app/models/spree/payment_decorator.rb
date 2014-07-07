@@ -3,7 +3,7 @@ Spree::Payment.class_eval do
   validates :amount, :numericality => { :less_than_or_equal_to => lambda { |payment| payment.order_remaining_total }}, :unless => :wallet?, :if => :amount_changed?, :allow_blank => true
   validate :restrict_wallet_when_no_user
 
-  after_create :complete!, :if => :wallet?
+  # after_create :complete!, :if => :wallet?
 
   delegate :remaining_total, :user_or_by_email, :to => :order, :prefix => true, :allow_nil => true
 

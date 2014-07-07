@@ -4,6 +4,7 @@ Spree::CheckoutController.class_eval do
   private
     def validate_payments
       payments_attributes = params[:order][:payments_attributes]
+      payments_attributes = payments_attributes.values if payments_attributes.is_a?(Hash)
       wallet_payment = wallet_payment_attributes(payments_attributes)
       if !spree_current_user && wallet_payment.present?
         flash[:error] = Spree.t(:cannot_select_wallet_while_guest_checkout)
