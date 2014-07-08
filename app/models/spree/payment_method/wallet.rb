@@ -15,5 +15,9 @@ module Spree
     def source_required?
       false
     end
+
+    def guest_checkout?
+      false
+    end
   end
 end

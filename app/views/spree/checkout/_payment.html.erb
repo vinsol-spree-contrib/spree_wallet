@@ -53,8 +53,8 @@
     </div>
 
     <ul id="payment-methods" data-hook>
-      <% @order.available_payment_methods_without_wallet.each do |method| %>
-        <li id="payment_method_<%= method.id %>" class="<%= 'last' if method == @order.available_payment_methods_without_wallet.last %>" data-hook>
+      <% @order.available_payment_methods.each do |method| %>
+        <li id="payment_method_<%= method.id %>" class="<%= 'last' if method == @order.available_payment_methods.last %>" data-hook>
           <fieldset>
             <%= render :partial => "spree/checkout/payment/#{method.method_type}", :locals => { :payment_method => method } %>
           </fieldset>

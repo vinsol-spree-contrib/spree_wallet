@@ -1,7 +1,7 @@
 Spree::Order.class_eval do
   fsm = self.state_machines[:state]
   fsm.after_transition :to => [:canceled], :do => :make_wallet_payments_void
-  fsm.before_transition :to => :complete, :do => :complete_wallet_payment
+  fsm.after_transition :to => :complete, :do => :complete_wallet_payment
 
   def user_or_by_email
     user ? user : Spree::User.where(:email => email).first
@@ -119,5 +119,6 @@ Spree::Order.class_eval do
 
     def complete_wallet_payment
       wallet_payments.with_state('checkout').each { |payment| payment.complete! }
+      update!
     end
 end
