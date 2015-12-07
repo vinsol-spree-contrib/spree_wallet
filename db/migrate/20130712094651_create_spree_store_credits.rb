@@ -4,11 +4,11 @@ class CreateSpreeStoreCredits < ActiveRecord::Migration
       t.string :reason
       t.string :type
       t.string :transaction_id
-      t.decimal :amount, :precision => 10, :scale => 2
-      t.decimal :balance, :precision => 10, :scale => 2
+      t.decimal :amount, precision: 10, scale: 2
+      t.decimal :balance, precision: 10, scale: 2
       t.integer :payment_mode
       t.references :user
-      
+
       t.timestamps
     end
   end

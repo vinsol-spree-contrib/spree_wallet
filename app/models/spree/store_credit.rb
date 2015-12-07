@@ -9,9 +9,9 @@ module Spree
     validates :transaction_id, :uniqueness => true, :allow_blank => true
 
     belongs_to :user, :class_name => Spree.user_class
-    
+
     before_validation :generate_transaction_id, :on => :create
-    before_create :update_user_wallet   
+    before_create :update_user_wallet
 
     scope :order_created_at_desc, -> { order('created_at desc') }
 

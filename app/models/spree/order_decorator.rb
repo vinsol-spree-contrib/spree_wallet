@@ -46,7 +46,7 @@ Spree::Order.class_eval do
     Spree::Money.new(remaining_total_after_wallet)
   end
 
-  def process_payments!    
+  def process_payments!
     if pending_payments.empty? && wallet_payments.empty?
       raise Spree::Core::GatewayError.new Spree.t(:no_pending_payments)
     else
