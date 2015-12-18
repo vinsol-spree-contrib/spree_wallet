@@ -46,10 +46,6 @@ Spree::Order.class_eval do
     Spree::Money.new(remaining_total_after_wallet)
   end
 
-  def process_payments!
-    process_payments_with(:process!)
-  end
-
   def process_payments_with(method)
     # Don't run if there is nothing to pay.
     return if payment_total >= total
