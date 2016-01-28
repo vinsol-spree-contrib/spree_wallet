@@ -15,7 +15,7 @@ Spree::Order.class_eval do
   end
 
   def remaining_total
-    (total - payment_total).to_f
+    total - payment_total
   end
 
   def available_payment_methods_without_wallet
