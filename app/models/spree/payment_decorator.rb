@@ -1,5 +1,5 @@
 Spree::Payment.class_eval do
-  validates :amount, :numericality => { :less_than_or_equal_to => lambda { |payment| [payment.order_user_or_by_email.store_credits_total, payment.order_remaining_total].min }, :greater_than_or_equal_to => 0 }, :if => lambda { |payment| payment.order_user_or_by_email && payment.wallet? && payment.amount_changed? }, :allow_blank => true
+  validates :amount, :numericality => { :less_than_or_equal_to => lambda { |payment| [payment.order_user_or_by_email.store_credits_total.to_f, payment.order_remaining_total.to_f].min }, :greater_than_or_equal_to => 0 }, :if => lambda { |payment| payment.order_user_or_by_email && payment.wallet? && payment.amount_changed? }, :allow_blank => true
   validates :amount, :numericality => { :less_than_or_equal_to => lambda { |payment| payment.order_remaining_total.to_f }}, :unless => :wallet?, :if => :amount_changed?, :allow_blank => true
   validate :restrict_wallet_when_no_user
 
