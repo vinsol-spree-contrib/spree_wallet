@@ -6,8 +6,8 @@ module Spree
     include Spree::DisableNegativePaymentModeAndSetBalanceAbility
 
     private
-      def effective_amount(amount = amount)
-        amount.to_f
+      def effective_amount(credit_amount = amount)
+        credit_amount.to_f
       end
   end
 end
