@@ -1,9 +1,9 @@
 Spree::Order.class_eval do
   fsm = self.state_machines[:state]
-  fsm.after_transition :to => [:canceled], :do => :make_wallet_payments_void
+  fsm.after_transition to: [:canceled], do: :make_wallet_payments_void
 
   def user_or_by_email
-    user ? user : Spree::User.where(:email => email).first
+    user ? user : Spree::User.where(email: email).first
   end
 
   def make_wallet_payments_void
@@ -19,11 +19,11 @@ Spree::Order.class_eval do
   end
 
   def available_payment_methods_without_wallet
-    available_payment_methods.reject { |p| p.is_a? Spree::PaymentMethod::Wallet }
+    available_payment_methods.reject { |_payment| _payment.is_a? Spree::PaymentMethod::Wallet }
   end
 
   def available_wallet_payment_method
-    @wallet_payment_method ||= available_payment_methods.select { |p| p.is_a? Spree::PaymentMethod::Wallet }.first
+    @wallet_payment_method ||= available_payment_methods.find { |_payment| _payment.is_a? Spree::PaymentMethod::Wallet }
   end
 
   def other_than_wallet_payment_required?

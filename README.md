@@ -22,6 +22,11 @@ gem 'spree_wallet', '2.1.0'
 gem 'spree_wallet', '2.0.6'
 ```
 
+```ruby
+# Spree 3.0.x
+gem 'spree_wallet', '3.0.0'
+```
+
 Bundle your dependencies and run the installation generator:
 
 ```shell
