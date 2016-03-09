@@ -1,14 +1,14 @@
 module Spree
   module DisableNegativePaymentModeAndSetBalanceAbility
-    def self.included(klass)
-      klass.class_eval do
-        attr_accessor :disable_negative_payment_mode
+    extend ActiveSupport::Concern
 
-        validates :payment_mode, inclusion: { in: klass::PAYMENT_MODE.values }, unless: :disable_negative_payment_mode
-        validates :payment_mode, inclusion: { in: klass::PAYMENT_MODE.values.select { |value| value >= 0 } }, if: :disable_negative_payment_mode
+    included do
+      attr_accessor :disable_negative_payment_mode
 
-        before_validation :set_balance, on: :create
-      end
+      validates :payment_mode, inclusion: { in: name.constantize::PAYMENT_MODE.values }, unless: :disable_negative_payment_mode
+      validates :payment_mode, inclusion: { in: name.constantize::PAYMENT_MODE.values.select { |value| value >= 0 } }, if: :disable_negative_payment_mode
+
+      before_validation :set_balance, on: :create
     end
 
     def set_balance

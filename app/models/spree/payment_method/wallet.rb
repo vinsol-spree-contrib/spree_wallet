@@ -17,7 +17,7 @@ module Spree
     end
 
     def can_void?(payment)
-      !['void', 'invalid'].include?(payment.state)
+      !['void', 'invalid', 'failed'].include?(payment.state)
     end
 
     def void(*args)

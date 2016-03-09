@@ -59,6 +59,17 @@ describe Spree::PaymentMethod::Wallet do
       end
     end
 
+    context 'when payment state is failed' do
+      before(:each) do
+        payment.state = 'failed'
+        payment.save!
+      end
+
+      it 'should return true if payment can be failed' do
+        expect(wallet_payment_method.can_void?(payment)).to eq(false)
+      end
+    end
+
     context 'when payment state is invalid' do
       before(:each) do
         payment.state = 'invalid'

@@ -23,7 +23,7 @@ module Spree
       def generate_transaction_id
         begin
           self.transaction_id = (Time.now.strftime("%s") + rand(999999).to_s).to(15)
-        end while Spree::StoreCredit.where(transaction_id: transaction_id).present?
+        end while Spree::StoreCredit.exists?(transaction_id: transaction_id)
       end
   end
 end

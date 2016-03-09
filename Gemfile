@@ -1,6 +1,7 @@
 source 'https://rubygems.org'
 gem 'rails',   '4.2.4'
 gem 'mysql2',  '~> 0.3.18'
+gem 'rake', '10.5.0'
 group :test do
   gem 'simplecov',               '~> 0.10.0'
   gem 'rspec-rails',             '~> 3.3.3'

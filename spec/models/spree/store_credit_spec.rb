@@ -146,11 +146,11 @@ describe Spree::StoreCredit do
 
       context 'when transaction_id is unique' do
         before(:each) do
-          allow(Spree::StoreCredit).to receive(:where).and_return([])
+          allow(Spree::StoreCredit).to receive(:exists?).and_return(false)
         end
 
         it 'should receive where on Spree::StoreCredit only once' do
-          expect(Spree::StoreCredit).to receive(:where).and_return([])
+          expect(Spree::StoreCredit).to receive(:exists?).and_return(false)
           store_credit.save!
         end
 
@@ -162,11 +162,11 @@ describe Spree::StoreCredit do
 
       context 'when transaction_id is not unique' do
         before(:each) do
-          allow(Spree::StoreCredit).to receive(:where).and_return([store_credit], [])
+          allow(Spree::StoreCredit).to receive(:exists?).and_return(true, false)
         end
 
         it 'should receive where on Spree::StoreCredit only once' do
-          expect(Spree::StoreCredit).to receive(:where).twice.and_return([store_credit], [])
+          expect(Spree::StoreCredit).to receive(:exists?).twice.and_return(true, false)
           store_credit.save!
         end
 

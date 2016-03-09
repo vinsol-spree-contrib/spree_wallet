@@ -1,8 +1,5 @@
 Spree::CheckoutController.class_eval do
-  before_filter :validate_payments, only: :update, if: -> {
-    @order && @order.has_checkout_step?("payment") && @order.payment? &&
-    @order.available_wallet_payment_method
-  }
+  before_action :validate_payments, only: :update, if: :check_wallet_payment?
 
   private
     def validate_payments
@@ -23,5 +20,10 @@ Spree::CheckoutController.class_eval do
 
     def non_wallet_payment_attributes(payment_attributes)
       @non_wallet_payment ||= payment_attributes - wallet_payment_attributes(payment_attributes)
+    end
+
+    def check_wallet_payment?
+      @order && @order.has_checkout_step?("payment") && @order.payment? &&
+        @order.available_wallet_payment_method
     end
 end

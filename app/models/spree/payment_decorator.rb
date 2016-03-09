@@ -48,7 +48,7 @@ Spree::Payment.class_eval do
       Spree::Debit.create!(
         amount: amount,
         payment_mode: Spree::Debit::PAYMENT_MODE['Order Purchase'],
-        reason: "Payment consumed for order #{order.number}",
+        reason: Spree.t(:store_debit_reason, order_number: order.number),
         user: order_user_or_by_email, balance: calculate_balance(amount)
       )
     end
@@ -57,7 +57,7 @@ Spree::Payment.class_eval do
       Spree::Credit.create!(
         amount: amount,
         payment_mode: Spree::Credit::PAYMENT_MODE['Payment Refund'],
-        reason: "Payment released for order #{order.number}",
+        reason: Spree.t(:store_credit_reason, order_number: order.number),
         user: order_user_or_by_email, balance: calculate_balance(amount)
       )
     end
