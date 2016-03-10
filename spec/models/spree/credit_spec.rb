@@ -2,13 +2,13 @@ require 'spec_helper'
 require File.join( File.dirname(__FILE__), 'shared_examples/disable_negative_payment_mode_ability_spec')
 
 
-describe Spree::Credit do
+describe Spree::Credit, type: :model do
   let(:user) { Spree::User.create!(:email => 'abc@test.com', :password => '123456') }
   let(:credit) { Spree::Credit.new(:amount => 123, :reason => 'test reason', :payment_mode => 0) { |credit| credit.user = user }}
 
   describe 'constants' do
     describe 'PAYMENT_MODE' do
-      it { Spree::Credit::PAYMENT_MODE.should eq({ 'Payment Refund' => -1, 'Refund' => 0, 'Bank' => 1 })}
+      it { expect(Spree::Credit::PAYMENT_MODE).to eq({ 'Payment Refund' => -1, 'Refund' => 0, 'Bank' => 1 })}
     end
   end
 
@@ -24,16 +24,16 @@ describe Spree::Credit do
       shared_examples_for 'cannot_set_balance' do
         it 'should not update balance' do
           credit.save
-          credit.balance.should_not eq(store_credits_total + credit.amount.to_f)
+          expect(credit.balance).not_to eq(store_credits_total + credit.amount.to_f)
         end
 
         it 'should not recieve effective_amount' do
-          credit.should_not_receive(:effective_amount)
+          expect(credit).not_to receive(:effective_amount)
           credit.save
         end
 
         it 'should receive set_balance' do
-          credit.should_receive(:set_balance).and_call_original
+          expect(credit).to receive(:set_balance).and_call_original
           credit.save
         end
       end
@@ -58,30 +58,30 @@ describe Spree::Credit do
         context 'when there is amount' do
           it 'should update balance' do
             credit.save!
-            credit.balance.should eq(store_credits_total + credit.amount)
+            expect(credit.balance).to eq(store_credits_total + credit.amount)
           end
 
           it 'should recieve effective_amount' do
-            credit.should_receive(:effective_amount).and_return(credit.amount)
+            expect(credit).to receive(:effective_amount).and_return(credit.amount)
             credit.save
           end
 
           describe 'effective_amount' do
             context 'when it has no arguement' do
               it 'should return the amount' do
-                credit.send(:effective_amount).should eq(credit.amount)
+                expect(credit.send(:effective_amount)).to eq(credit.amount)
               end
             end
 
             context 'when it has arguement' do
               it 'should return the value' do
-                credit.send(:effective_amount, 1000).should eq(1000)
+                expect(credit.send(:effective_amount, 1000)).to eq(1000)
               end
             end
           end
 
           it 'should receive set_balance' do
-            credit.should_receive(:set_balance).and_call_original
+            expect(credit).to receive(:set_balance).and_call_original
             credit.save!
           end
         end
@@ -96,11 +96,11 @@ describe Spree::Credit do
 
       it 'should not update balance' do
         credit.save!
-        credit.balance.should_not eq(user.store_credits_total + credit.amount)
+        expect(credit.balance).not_to eq(user.store_credits_total + credit.amount)
       end
 
       it 'should not receive set_balance' do
-        credit.should_not_receive(:set_balance)
+        expect(credit).not_to receive(:set_balance)
         credit.save!
       end
     end

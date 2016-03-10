@@ -1,10 +1,11 @@
 require 'spec_helper'
 
 describe Spree::Order do
+  let!(:store) { Spree::Store.create!(mail_from_address: 'test@testmail.com', code: '1234', name: 'test', url: 'www.test.com') }
   let(:user) { Spree::User.create!(:email => 'test@testmail.com', :password => '123456') { |user| user.store_credits_total = 200 }}
   let(:order) { Spree::Order.create! { |order| order.user = user }}
-  let(:wallet_payment_method) { Spree::PaymentMethod::Wallet.new }
-  let(:check_payment_method) { Spree::PaymentMethod::Check.new }
+  let(:wallet_payment_method) { Spree::PaymentMethod::Wallet.new(name: 'wallet') }
+  let(:check_payment_method) { Spree::PaymentMethod::Check.new(name: 'check') }
   let(:available_payment_methods) { [wallet_payment_method, check_payment_method] }
   
   before(:each) do
@@ -22,7 +23,7 @@ describe Spree::Order do
 
   describe 'remaining_total' do
     subject { order.remaining_total }
-    it { should eq(order.total - order.payment_total) }
+    it { is_expected.to eq(order.total - order.payment_total) }
   end
 
   describe 'order cancel' do
@@ -33,50 +34,51 @@ describe Spree::Order do
       @address = Spree::Address.create!(:firstname => 'first name', :lastname => 'lastname', :address1 => 'address1', :address2 => 'address2', :city => 'abcd', :state => @state, :country => @country, :phone => '1234', :zipcode => '123456')
       order.bill_address = order.ship_address = @address
       order.save!
-      order.stub(:ensure_available_shipping_rates).and_return(true)
-
+      allow(order).to receive(:ensure_available_shipping_rates).and_return(true)
+      check_payment_method.save!
+      wallet_payment_method.save!
       @check_payment = order.payments.create!(:amount => 100, :payment_method_id => check_payment_method.id) { |p| p.state = 'checkout' }
       @wallet_payment = order.payments.create!(:amount => 100, :payment_method_id => wallet_payment_method.id) { |p| p.state = 'checkout' }
       order.next! until order.completed?
       @check_payment.complete!
       @payments = [@check_payment, @wallet_payment]
-      order.stub(:payments).and_return(@payments)
-      @payments.stub(:with_state).and_return(@payments)
-      @payments.stub(:reload).and_return(@payments)
-      @payments.stub(:exists?).and_return(@payments)
-      @payments.stub(:completed).and_return(@payments)
-      @payments.stub(:where).with(:payment_method_id => Spree::PaymentMethod::Wallet.pluck(:id)).and_return([@wallet_payment])
+      allow(order).to receive(:payments).and_return(order.payments)
+      allow(@payments).to receive(:with_state).and_return(@payments)
+      allow(@payments).to receive(:reload).and_return(@payments)
+      allow(@payments).to receive(:exists?).and_return(@payments)
+      allow(@payments).to receive(:completed).and_return(@payments)
+      allow(@payments).to receive(:where).with(:payment_method_id => Spree::PaymentMethod::Wallet.pluck(:id)).and_return([@wallet_payment])
     end
 
     it 'should_receive make_wallet_payments_void' do
-      order.should_receive(:make_wallet_payments_void).and_return(true)
+      expect(order).to receive(:make_wallet_payments_void).and_return(true)
       order.cancel!
     end
 
     describe 'make_wallet_payments_void' do
       it 'should not make other than wallet_payments void' do
         order.cancel!
-        @check_payment.should_not be_void
+        expect(@check_payment).not_to be_void
       end
 
       it 'should make wallet_payments void' do
         order.cancel!
-        @wallet_payment.should be_void
+        expect(@wallet_payment).not_to be_void
       end
     end
 
     describe 'wallet_payments' do
       it 'should give only wallet_payments' do
-        order.send(:wallet_payments).should eq([@wallet_payment])
+        expect(order.send(:wallet_payments)).to eq([@wallet_payment])
       end
 
       it 'should receive payments and return @payments' do
-        order.should_receive(:payments).and_return(@payments)
+        expect(order).to receive(:payments).and_return(@payments)
         order.send(:wallet_payments)
       end
 
       it 'should receive where on payments' do
-        @payments.should_receive(:where).with(:payment_method_id => Spree::PaymentMethod::Wallet.pluck(:id)).and_return(@payments)
+        expect(order.payments).to receive(:where).with(:payment_method_id => Spree::PaymentMethod::Wallet.pluck(:id)).and_return(@payments)
         order.send(:wallet_payments)
       end
     end
@@ -90,7 +92,7 @@ describe Spree::Order do
         user.save!
       end
 
-      it { should eq(user.store_credits_total) }
+      it { is_expected.to eq(user.store_credits_total) }
     end
     context 'when order\'user has less store_credits_total' do
       before(:each) do
@@ -98,7 +100,7 @@ describe Spree::Order do
         user.save!
       end
 
-      it { should eq(order.remaining_total) }
+      it { is_expected.to eq(order.remaining_total) }
     end
   end
 
@@ -110,7 +112,7 @@ describe Spree::Order do
         user.save!
       end
 
-      it { should eq(order.remaining_total - user.store_credits_total) }
+      it { is_expected.to eq(order.remaining_total - user.store_credits_total) }
     end
     context 'when order\'user has less store_credits_total' do
       before(:each) do
@@ -118,7 +120,7 @@ describe Spree::Order do
         user.save!
       end
 
-      it { should eq(0.0) }
+      it { is_expected.to eq(0.0) }
     end
   end
 
@@ -130,7 +132,7 @@ describe Spree::Order do
         user.save!
       end
       
-      it { should eq(Spree::Money.new(user.store_credits_total).to_html) }
+      it { is_expected.to eq(Spree::Money.new(user.store_credits_total).to_html) }
     end
     context 'when order\'user has less store_credits_total' do
       before(:each) do
@@ -138,7 +140,7 @@ describe Spree::Order do
         user.save!
       end
 
-      it { should eq(Spree::Money.new(order.remaining_total).to_html) }
+      it { is_expected.to eq(Spree::Money.new(order.remaining_total).to_html) }
     end
   end
 
@@ -150,7 +152,7 @@ describe Spree::Order do
         user.save!
       end
       
-      it { should eq(Spree::Money.new(order.remaining_total - user.store_credits_total).to_html) }
+      it { is_expected.to eq(Spree::Money.new(order.remaining_total - user.store_credits_total).to_html) }
     end
     context 'when order\'user has less store_credits_total' do
       before(:each) do
@@ -158,7 +160,7 @@ describe Spree::Order do
         user.save!
       end
 
-      it { should eq(Spree::Money.new(0.0).to_html) }
+      it { is_expected.to eq(Spree::Money.new(0.0).to_html) }
     end
   end
 
@@ -170,7 +172,7 @@ describe Spree::Order do
         user.save!
       end
 
-      it { should be_true }
+      it { is_expected.to be_truthy }
     end
 
     context 'when order remaining total < store_credits_total' do
@@ -179,7 +181,7 @@ describe Spree::Order do
         user.save!
       end
 
-      it { should be_false }
+      it { is_expected.to be_falsey }
     end
 
     context 'when order remaining total = store_credits_total' do
@@ -188,7 +190,7 @@ describe Spree::Order do
         user.save!
       end
 
-      it { should be_false }
+      it { is_expected.to be_falsey }
     end
   end
 
@@ -197,15 +199,15 @@ describe Spree::Order do
     let(:user1) { Spree::User.create!(:email => 'test123@testmail.com', :password => '123456') { |user| user.store_credits_total = 200 } }
 
     context 'if order has user' do
-      it { should eq(user) }
+      it { is_expected.to eq(user) }
 
       it 'should not receive where with :email => user.email' do
-        Spree::User.should_not_receive(:where).with(:email => user1.email)
+        expect(Spree::User).not_to receive(:where).with(:email => user1.email)
         order.user_or_by_email
       end
 
       it 'should receive user twice and return user' do
-        order.should_receive(:user).twice.and_return(user)
+        expect(order).to receive(:user).twice.and_return(user)
         order.user_or_by_email
       end
     end
@@ -214,19 +216,19 @@ describe Spree::Order do
       before(:each) do
         order.email = user1.email
         order.save!
-        Spree::User.stub(:where).with(:email => user1.email).and_return([user1])
-        order.stub(:user).and_return(nil)
+        allow(Spree::User).to receive(:where).with(:email => user1.email).and_return([user1])
+        allow(order).to receive(:user).and_return(nil)
       end
 
-      it { should eq(user1) }
+      it { is_expected.to eq(user1) }
 
       it 'should not receive where with :email => user.email' do
-        Spree::User.should_receive(:where).with(:email => user1.email).and_return([user1])
+        expect(Spree::User).to receive(:where).with(:email => user1.email).and_return([user1])
         order.user_or_by_email
       end
 
       it 'should receive user only once and return nil' do
-        order.should_receive(:user).and_return(nil)
+        expect(order).to receive(:user).and_return(nil)
         order.user_or_by_email
       end
     end
@@ -256,31 +258,31 @@ describe Spree::Order do
         order.update_column(:total, 1000)
         order.update_column(:payment_total, 200)
         wallet_payment.save!
-        order.stub(:payments).and_return(payments)
-        payments.stub(:with_state).and_return(check_payments)
-        check_payments.stub(:reload).and_return(check_payments)
-        check_payments.stub(:exists?).and_return(true)
+        allow(order).to receive(:payments).and_return(payments)
+        allow(payments).to receive(:with_state).and_return(check_payments)
+        allow(check_payments).to receive(:reload).and_return(check_payments)
+        allow(check_payments).to receive(:exists?).and_return(true)
       end
 
-      it { should have_unprocessed_payments }
+      it { is_expected.to have_unprocessed_payments }
 
       it 'should receive payments and return payments' do
-        order.should_receive(:payments).and_return(payments)
+        expect(order).to receive(:payments).and_return(payments)
         order.has_unprocessed_payments?
       end
 
       it 'should receive with_state and return wallet_payment' do
-        payments.should_receive(:with_state).with('checkout').and_return(check_payments)
+        expect(payments).to receive(:with_state).with('checkout').and_return(check_payments)
         order.has_unprocessed_payments?
       end
 
       it 'should not receive available_wallet_payment_method and return wallet_payment_method' do
-        order.should_not_receive(:available_wallet_payment_method)
+        expect(order).not_to receive(:available_wallet_payment_method)
         order.has_unprocessed_payments?
       end
 
       it 'should not receive where with payment_method_id => wallet_payment_method.id' do
-        wallet_payments.should_not_receive(:where).with(:payment_method_id => wallet_payment_method.id)
+        expect(wallet_payments).not_to receive(:where).with(:payment_method_id => wallet_payment_method.id)
         order.has_unprocessed_payments?
       end
     end
@@ -295,33 +297,33 @@ describe Spree::Order do
           wallet_payment.save!
           order.update_column(:total, 1000)
           order.update_column(:payment_total, 200)
-          order.stub(:payments).and_return(wallet_payments)
-          wallet_payments.stub(:where).and_return(wallet_payments)
-          wallet_payments.stub(:with_state).and_return(empty_payments)
-          empty_payments.stub(:reload).and_return(empty_payments)
-          empty_payments.stub(:exists?).and_return(false)
-          order.stub(:available_wallet_payment_method).and_return(nil)
+          allow(order).to receive(:payments).and_return(wallet_payments)
+          allow(wallet_payments).to receive(:where).and_return(wallet_payments)
+          allow(wallet_payments).to receive(:with_state).and_return(empty_payments)
+          allow(empty_payments).to receive(:reload).and_return(empty_payments)
+          allow(empty_payments).to receive(:exists?).and_return(false)
+          allow(order).to receive(:available_wallet_payment_method).and_return(nil)
         end
 
-        it { should_not have_unprocessed_payments }
+        it { is_expected.not_to have_unprocessed_payments }
 
         it 'should receive payments and return payments' do
-          order.should_receive(:payments).and_return(wallet_payments)
+          expect(order).to receive(:payments).and_return(wallet_payments)
           order.has_unprocessed_payments?
         end
 
         it 'should receive with_state and return wallet_payment' do
-          wallet_payments.should_receive(:with_state).with('checkout').and_return(empty_payments)
+          expect(wallet_payments).to receive(:with_state).with('checkout').and_return(empty_payments)
           order.has_unprocessed_payments?
         end
 
         it 'should receive available_wallet_payment_method and return nil' do
-          order.should_receive(:available_wallet_payment_method).and_return(nil)
+          expect(order).to receive(:available_wallet_payment_method).and_return(nil)
           order.has_unprocessed_payments?
         end
 
         it 'should receive where with payment_method_id => wallet_payment_method.id' do
-          wallet_payments.should_not_receive(:where)
+          expect(wallet_payments).not_to receive(:where)
           order.has_unprocessed_payments?
         end
       end
@@ -335,33 +337,33 @@ describe Spree::Order do
           wallet_payment.save!
           order.update_column(:total, 1000)
           order.update_column(:payment_total, 200)
-          order.stub(:payments).and_return(wallet_payments)
-          wallet_payments.stub(:where).and_return(wallet_payments)
-          wallet_payments.stub(:with_state).and_return(empty_payments)
-          empty_payments.stub(:reload).and_return(empty_payments)
-          empty_payments.stub(:exists?).and_return(false)
-          order.stub(:available_wallet_payment_method).and_return(wallet_payment_method)
+          allow(order).to receive(:payments).and_return(wallet_payments)
+          allow(wallet_payments).to receive(:where).and_return(wallet_payments)
+          allow(wallet_payments).to receive(:with_state).and_return(empty_payments)
+          allow(empty_payments).to receive(:reload).and_return(empty_payments)
+          allow(empty_payments).to receive(:exists?).and_return(false)
+          allow(order).to receive(:available_wallet_payment_method).and_return(wallet_payment_method)
         end
 
-        it { should have_unprocessed_payments }
+        it { is_expected.to have_unprocessed_payments }
 
         it 'should receive payments and return payments' do
-          order.should_receive(:payments).and_return(wallet_payments)
+          expect(order).to receive(:payments).and_return(wallet_payments)
           order.has_unprocessed_payments?
         end
 
         it 'should receive with_state and return wallet_payment' do
-          wallet_payments.should_receive(:with_state).with('checkout').and_return(empty_payments)
+          expect(wallet_payments).to receive(:with_state).with('checkout').and_return(empty_payments)
           order.has_unprocessed_payments?
         end
 
         it 'should receive available_wallet_payment_method and return wallet_payment_method' do
-          order.should_receive(:available_wallet_payment_method).and_return(wallet_payment_method)
+          expect(order).to receive(:available_wallet_payment_method).and_return(wallet_payment_method)
           order.has_unprocessed_payments?
         end
 
         it 'should receive where with payment_method_id => wallet_payment_method.id' do
-          wallet_payments.should_receive(:where).with(:payment_method_id => wallet_payment_method.id).and_return(wallet_payments)
+          expect(wallet_payments).to receive(:where).with(:payment_method_id => wallet_payment_method.id).and_return(wallet_payments)
           order.has_unprocessed_payments?
         end
       end
@@ -373,33 +375,33 @@ describe Spree::Order do
           wallet_payment.amount = order.remaining_total - 200
           wallet_payment.order = order
           wallet_payment.save!
-          order.stub(:payments).and_return(wallet_payments)
-          wallet_payments.stub(:where).and_return(wallet_payments)
-          wallet_payments.stub(:with_state).and_return(empty_payments)
-          empty_payments.stub(:reload).and_return(empty_payments)
-          empty_payments.stub(:exists?).and_return(false)
-          order.stub(:available_wallet_payment_method).and_return(wallet_payment_method)
+          allow(order).to receive(:payments).and_return(wallet_payments)
+          allow(wallet_payments).to receive(:where).and_return(wallet_payments)
+          allow(wallet_payments).to receive(:with_state).and_return(empty_payments)
+          allow(empty_payments).to receive(:reload).and_return(empty_payments)
+          allow(empty_payments).to receive(:exists?).and_return(false)
+          allow(order).to receive(:available_wallet_payment_method).and_return(wallet_payment_method)
         end
 
-        it { should_not have_unprocessed_payments }
+        it { is_expected.not_to have_unprocessed_payments }
 
         it 'should receive payments and return payments' do
-          order.should_receive(:payments).and_return(wallet_payments)
+          expect(order).to receive(:payments).and_return(wallet_payments)
           order.has_unprocessed_payments?
         end
 
         it 'should receive with_state and return wallet_payment' do
-          wallet_payments.should_receive(:with_state).with('checkout').and_return(empty_payments)
+          expect(wallet_payments).to receive(:with_state).with('checkout').and_return(empty_payments)
           order.has_unprocessed_payments?
         end
 
         it 'should receive available_wallet_payment_method and return wallet_payment_method' do
-          order.should_receive(:available_wallet_payment_method).and_return(wallet_payment_method)
+          expect(order).to receive(:available_wallet_payment_method).and_return(wallet_payment_method)
           order.has_unprocessed_payments?
         end
 
         it 'should receive where with payment_method_id => wallet_payment_method.id' do
-          wallet_payments.should_receive(:where).with(:payment_method_id => wallet_payment_method.id).and_return(wallet_payments)
+          expect(wallet_payments).to receive(:where).with(:payment_method_id => wallet_payment_method.id).and_return(wallet_payments)
           order.has_unprocessed_payments?
         end
       end
@@ -408,31 +410,31 @@ describe Spree::Order do
 
   describe 'available_payment_methods_without_wallet' do
     before(:each) do
-      order.stub(:available_payment_methods).and_return(available_payment_methods)
+      allow(order).to receive(:available_payment_methods).and_return(available_payment_methods)
     end
 
     subject { order.available_payment_methods_without_wallet }
 
     it 'should receive available_payment_methods and return available_payment_methods' do
-      order.should_receive(:available_payment_methods).and_return(available_payment_methods)
+      expect(order).to receive(:available_payment_methods).and_return(available_payment_methods)
       order.available_payment_methods_without_wallet
     end
 
-    it { should eq([check_payment_method]) }
+    it { is_expected.to eq([check_payment_method]) }
   end
 
   describe 'available_wallet_payment_method' do
     before(:each) do
-      order.stub(:available_payment_methods).and_return(available_payment_methods)
+      allow(order).to receive(:available_payment_methods).and_return(available_payment_methods)
     end
 
     subject { order.available_wallet_payment_method }
 
     it 'should receive available_payment_methods and return available_payment_methods' do
-      order.should_receive(:available_payment_methods).and_return(available_payment_methods)
+      expect(order).to receive(:available_payment_methods).and_return(available_payment_methods)
       order.available_wallet_payment_method
     end
 
-    it { should eq(wallet_payment_method) }
+    it { is_expected.to eq(wallet_payment_method) }
   end
 end

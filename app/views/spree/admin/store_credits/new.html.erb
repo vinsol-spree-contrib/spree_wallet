@@ -1,27 +1,31 @@
-<%= render :partial => 'spree/admin/shared/configuration_menu' %>
+<%= render partial: 'spree/admin/shared/sub_menu/configuration' %>
 
-<h1><%= Spree.t("new_store_#{@store_credit.type.demodulize.downcase}")%></h1>
+<% content_for :page_title do %>
+  <%= Spree.t("new_store_#{@store_credit.type.demodulize.downcase}")%>
+<% end %>
 
-<%= render 'spree/shared/error_messages', :target => @store_credit %>
+<%= render 'spree/shared/error_messages', target: @store_credit %>
 
-<h3 data-hook='user-email'>User Email: <%= @store_credit.user.email %></h3>
+<h4 data-hook='user-email'>User Email: <%= @store_credit.user.email %></h3>
 <h4 data-hook='user-email'>Current Balance: <%= @store_credit.user.store_credits_total %></h4>
 
-<%= form_for [:admin, @user, @store_credit], :as => :store_credit do |f| %>
-  <%= f.field_container :amount do %>
-    <%= f.label :amount %>*<br />
-    <%= f.text_field :amount, :id => "debit_credit_amount" %>
-  <% end %>
+<div data-hook="transactions_new_form">
+  <%= form_for [:admin, @user, @store_credit], as: :store_credit do |f| %>
+    <%= f.field_container :amount, class: ['form-group'] do %>
+      <%= f.label :amount %>*<br />
+      <%= f.text_field :amount, id: "debit_credit_amount", class: 'form-control' %>
+    <% end %>
 
-  <%= f.field_container :payment_mode do %>
-    <%= f.label :payment_mode, 'Payment Mode' %>*<br />
-    <%= f.select :payment_mode, store_credit_class::PAYMENT_MODE.select { |key, value| value >= 0 }, { :prompt => 'Select' } %>
-  <% end %>
+    <%= f.field_container :payment_mode, class: ['form-group'] do %>
+      <%= f.label :payment_mode, 'Payment Mode' %>*<br />
+      <%= f.select :payment_mode, store_credit_class::PAYMENT_MODE.select { |key, value| value >= 0 }, { prompt: 'Select' }, class: 'select2' %>
+    <% end %>
 
-  <%= f.field_container :reason do %>
-    <%= f.label :reason %>*<br />
-    <%= f.text_field :reason %>
-  <% end %>
+    <%= f.field_container :reason, class: ['form-group'] do %>
+      <%= f.label :reason %>*<br />
+      <%= f.text_field :reason, class: 'form-control' %>
+    <% end %>
 
-  <%= f.submit :commit, :value => @store_credit.type.demodulize, :class => 'button', :id => 'debit_credit' %>
-<% end %>
+    <%= f.submit :commit, value: @store_credit.type.demodulize, class: 'button', id: 'debit_credit' %>
+  <% end %>
+</div>

@@ -1,9 +1,9 @@
 Spree::Order.class_eval do
   fsm = self.state_machines[:state]
-  fsm.after_transition :to => [:canceled], :do => :make_wallet_payments_void
+  fsm.after_transition to: [:canceled], do: :make_wallet_payments_void
 
   def user_or_by_email
-    user ? user : Spree::User.where(:email => email).first
+    user ? user : Spree::User.where(email: email).first
   end
 
   def make_wallet_payments_void
@@ -19,11 +19,11 @@ Spree::Order.class_eval do
   end
 
   def available_payment_methods_without_wallet
-    available_payment_methods.reject { |p| p.is_a? Spree::PaymentMethod::Wallet }
+    available_payment_methods.reject { |_payment| _payment.is_a? Spree::PaymentMethod::Wallet }
   end
 
   def available_wallet_payment_method
-    @wallet_payment_method ||= available_payment_methods.select { |p| p.is_a? Spree::PaymentMethod::Wallet }.first
+    @wallet_payment_method ||= available_payment_methods.find { |_payment| _payment.is_a? Spree::PaymentMethod::Wallet }
   end
 
   def other_than_wallet_payment_required?
@@ -46,23 +46,24 @@ Spree::Order.class_eval do
     Spree::Money.new(remaining_total_after_wallet)
   end
 
-  def process_payments!    
-    if pending_payments.empty? && wallet_payments.empty?
-      raise Spree::Core::GatewayError.new Spree.t(:no_pending_payments)
-    else
-      [pending_payments, wallet_payments].flatten.each do |payment|
-        break if payment_total >= total
+  def process_payments_with(method)
+    # Don't run if there is nothing to pay.
+    return if payment_total >= total
+    # Prevent orders from transitioning to complete without a successfully processed payment.
+    raise Spree::Core::GatewayError.new(Spree.t(:no_payment_found)) if unprocessed_payments.empty? && wallet_payments.empty?
 
-        payment.process!
+    [unprocessed_payments, wallet_payments].flatten.each do |payment|
+      break if payment_total >= total
 
-        if payment.completed?
-          self.payment_total += payment.amount
-        end
+      payment.public_send(method)
+
+      if payment.completed?
+        self.payment_total += payment.amount
       end
     end
-  rescue Spree::Core::GatewayError => e
-    result = !!Spree::Config[:allow_checkout_on_gateway_error]
-    errors.add(:base, e.message) and return result
+    rescue Spree::Core::GatewayError => e
+      result = !!Spree::Config[:allow_checkout_on_gateway_error]
+      errors.add(:base, e.message) and return result
   end
 
 
