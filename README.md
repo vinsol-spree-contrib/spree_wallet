@@ -42,6 +42,8 @@ From Admin end, create a payment method of Wallet type. From User end, user can 
 
 While from admin end, Admin can select any amount from wallet, but it should be less than amount present in user's balance. 
 
+**Here is a detailed article with screenshot http://vinsol.com/spreecommerce-wallet**
+
 Testing
 -------
 
@@ -60,4 +62,4 @@ Credits
 
 [![vinsol.com: Ruby on Rails, iOS and Android developers](http://vinsol.com/vin_logo.png "Ruby on Rails, iOS and Android developers")](http://vinsol.com)
 
-Copyright (c) 2014 [vinsol.com](http://vinsol.com "Ruby on Rails, iOS and Android developers"), released under the New MIT License
+Copyright (c) 2016 [vinsol.com](http://vinsol.com "Ruby on Rails, iOS and Android developers"), released under the New MIT License
