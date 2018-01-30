@@ -86,7 +86,7 @@ Spree::Order.class_eval do
           wallet_payments = wallet_payment_attributes(@updating_params[:order][:payments_attributes])
           wallet_payments.first[:amount] = [remaining_total, user.store_credits_total].min if wallet_payments.present?
           @updating_params[:order][:payments_attributes] = wallet_payments if remaining_order_total_after_wallet(wallet_payments) <= 0
-          non_wallet_payment_attributes(@updating_params[:order][:payments_attributes]).first[:amount] = remaining_order_total_after_wallet(wallet_payments) if non_wallet_payment_attributes(@updating_params[:order][:payments_attributes]).present?
+          update_amount_for_non_wallet_payments if non_wallet_payment_attributes(@updating_params[:order][:payments_attributes]).present?
         else
           @updating_params[:order][:payments_attributes].first[:amount] = remaining_total
         end
@@ -114,5 +114,13 @@ Spree::Order.class_eval do
   private
     def wallet_payments
       payments.where(:payment_method_id => Spree::PaymentMethod::Wallet.pluck(:id))
+    end
+
+    def update_amount_for_non_wallet_payments
+      @updating_params[:order][:payments_attributes].each do |attributes|
+        if non_wallet_payment_attributes(@updating_params[:order][:payments_attributes]).first["payment_method_id"] == attributes["payment_method_id"]
+          attributes[:amount] = remaining_order_total_after_wallet(wallet_payments)
+        end
+      end
     end
 end
